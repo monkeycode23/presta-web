@@ -1,0 +1,182 @@
+import React from "react";
+/* 
+import { useSelector,useDispatch } from "react-redux"
+
+import {setPage} from '../redux/slices/pagination' */
+
+import { usePaginationFilterStore } from "../store/PaginationFilter";
+
+const Page = ({ number, className }: any) => {
+  /* 
+  const pagination = useSelector(state => state.pagination)
+  const dispatch = useDispatch() */
+
+  const { filters, setFilters, pagination, setPage } =
+    usePaginationFilterStore();
+
+  return (
+    <li
+      onClick={() => {
+        // dispatch(setPage(number))
+      }}
+      key={number}
+      className={`${className}
+     ${
+       pagination.page == number ? "bg-blue-600 text-white" : "text-gray-700"
+     } hover:bg-brand-500 hover:text-white dark:text-gray-400 dark:hover:text-white`}
+    >
+      {number}
+    </li>
+  );
+};
+
+function Pagination({ size }: any) {
+  const { filters, setFilters, pagination, setPage } =
+    usePaginationFilterStore();
+
+  const { page } = pagination;
+
+  //console.log(pagination,"pagination data")
+
+  const totalPages =
+    pagination.total > pagination.pageSize
+      ? Math.ceil(pagination.total / pagination.pageSize)
+      : 1;
+
+  const pages = Array.from({ length: totalPages }, (_, i) => i); // Ejemplo: números 0 al 4
+
+  //console.log(totalPages,pages,pagination.totalItems,pagination.limitPerPage)
+
+  let classes =
+    "flex items-center justify-between gap-4 px-6 py-4 sm:justify-normal";
+  let buttonClasses =
+    "flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 sm:px-3.5 sm:py-2.5";
+  let pageClasses =
+    "flex h-10 w-10 items-center justify-center rounded-lg text-sm font-medium";
+  let buttonsProps = {
+    with: 20,
+    height: 20,
+  };
+
+  switch (size) {
+    case "sm":
+      classes =
+        "flex  items-center justify-between gap-2 px-2 py-1 sm:justify-normal";
+      buttonClasses =
+        "flex items-center gap-2 rounded-lg border border-gray-300 bg-white  text-xs  text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 sm:px-3.5 sm:py-2.5";
+
+      pageClasses =
+        " flex h-7 w-7 items-center justify-center rounded-lg text-xs ";
+      buttonsProps.with = 8;
+      buttonsProps.height = 8;
+
+      break;
+
+    default:
+      break;
+  }
+
+  const elipsePagination = () => {
+    const firstPages = (
+      <>
+        <Page className={pageClasses} number={1}></Page>
+        <Page className={pageClasses} number={2}></Page>
+        <Page className={pageClasses} number={3}></Page>
+      </>
+    );
+
+    const lastPages = (
+      <>
+        <Page className={pageClasses} number={totalPages - 1}></Page>
+        <Page className={pageClasses} number={totalPages}></Page>
+      </>
+    );
+
+    return (
+      <>
+        {firstPages}
+        {page > 3 && page < totalPages - 1 ? (
+          <>
+            ...
+            <Page className={pageClasses} number={page}></Page>
+            ...{" "}
+          </>
+        ) : (
+          <>...</>
+        )}
+        {lastPages}
+      </>
+    );
+  };
+
+  return (
+    <div className={classes}>
+      <div>10-200</div>
+      <button
+        onClick={() => {
+          if (pagination.page > 1) {
+            setPage(pagination.page - 1);
+          }
+        }}
+        disabled={pagination.page == 1}
+        className={buttonClasses}
+      >
+        <svg
+          className="fill-current"
+          {...buttonsProps}
+          viewBox="0 0 20 20"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M2.58203 9.99868C2.58174 10.1909 2.6549 10.3833 2.80152 10.53L7.79818 15.5301C8.09097 15.8231 8.56584 15.8233 8.85883 15.5305C9.15183 15.2377 9.152 14.7629 8.85921 14.4699L5.13911 10.7472L16.6665 10.7472C17.0807 10.7472 17.4165 10.4114 17.4165 9.99715C17.4165 9.58294 17.0807 9.24715 16.6665 9.24715L5.14456 9.24715L8.85919 5.53016C9.15199 5.23717 9.15184 4.7623 8.85885 4.4695C8.56587 4.1767 8.09099 4.17685 7.79819 4.46984L2.84069 9.43049C2.68224 9.568 2.58203 9.77087 2.58203 9.99715C2.58203 9.99766 2.58203 9.99817 2.58203 9.99868Z"
+            fill=""
+          ></path>
+        </svg>
+      </button>
+      <ul className="hidden items-center gap-0.5 sm:flex">
+        {totalPages > 7 ? (
+          elipsePagination()
+        ) : (
+          <>
+            {pages.map((pageNumber, i) => (
+              <Page
+                className={pageClasses}
+                key={i}
+                number={pageNumber + 1}
+              ></Page>
+            ))}
+          </>
+        )}
+      </ul>
+      <button
+        onClick={() => {
+          if (pagination.page < totalPages) {
+            setPage(pagination.page + 1);
+          }
+        }}
+        disabled={pagination.page == totalPages}
+        className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 sm:px-3.5 sm:py-2.5"
+      >
+        <svg
+          className="fill-current"
+          {...buttonsProps}
+          viewBox="0 0 20 20"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M17.4165 9.9986C17.4168 10.1909 17.3437 10.3832 17.197 10.53L12.2004 15.5301C11.9076 15.8231 11.4327 15.8233 11.1397 15.5305C10.8467 15.2377 10.8465 14.7629 11.1393 14.4699L14.8594 10.7472L3.33203 10.7472C2.91782 10.7472 2.58203 10.4114 2.58203 9.99715C2.58203 9.58294 2.91782 9.24715 3.33203 9.24715L14.854 9.24715L11.1393 5.53016C10.8465 5.23717 10.8467 4.7623 11.1397 4.4695C11.4327 4.1767 11.9075 4.17685 12.2003 4.46984L17.1578 9.43049C17.3163 9.568 17.4165 9.77087 17.4165 9.99715C17.4165 9.99763 17.4165 9.99812 17.4165 9.9986Z"
+            fill=""
+          ></path>
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+export default Pagination;
