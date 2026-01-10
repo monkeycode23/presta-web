@@ -8,7 +8,7 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import { ClientList } from "./pages/Clients";
 import { PaymentsCalendar } from "./pages/Payments";
 import { EmployeeManagement } from "./pages/Employee";
-import { ClientDetail } from "./pages/ClientDetail";
+import { ClientDetail } from "./pages/ClientDetail/index";
 
 const router = createBrowserRouter([
     {

@@ -13,7 +13,7 @@ interface ClientStore {
   // Actions
   setClients: (clients: IClient[]) => void;
   addClient: (client: IClient) => void;
-  updateClient: (client: IClient) => void;
+  updateClient: (clientId:string,client: Partial<IClient>) => void;
   removeClient: (id: string) => void;
   selectClient: (client?: IClient) => void;
   setLoading: (loading: boolean) => void;
@@ -27,18 +27,37 @@ export const useClientStore = create<ClientStore>((set) => ({
   error: undefined,
 
   setClients: (clients) => set({ clients }),
-  addClient: (client) => set((state) => ({ clients: [...state.clients, client] })),
-  updateClient: (updatedClient) =>
-    set((state) => ({
+  addClient: (client) =>
+    set((state) => ({ clients: [...state.clients, client] })),
+ updateClient: (clientId: string, updatedClient: Partial<IClient>) =>
+  set((state) => {
+    const result: any = {
       clients: state.clients.map((c) =>
-        c._id === updatedClient._id ? updatedClient : c
-      )
-    })),
+        c._id === clientId
+          ? {
+              ...c,  // Mantén las propiedades existentes del cliente
+              ...updatedClient,  // Solo actualiza las propiedades que han cambiado
+            }
+          : c
+      ),
+    };
+
+    // Si `selectedClient` es el que estamos actualizando, también lo modificamos
+    if (state.selectedClient && state.selectedClient._id === clientId) {
+      result.selectedClient = {
+        ...state.selectedClient,  // Mantén las propiedades actuales de selectedClient
+        ...updatedClient,  // Solo actualiza las propiedades que han cambiado
+      };
+    }
+
+    return result;
+  }),
+
   removeClient: (id) =>
     set((state) => ({
-      clients: state.clients.filter((c) => c._id !== id)
+      clients: state.clients.filter((c) => c._id !== id),
     })),
   selectClient: (client) => set({ selectedClient: client }),
   setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error })
+  setError: (error) => set({ error }),
 }));

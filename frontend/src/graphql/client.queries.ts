@@ -1,76 +1,110 @@
-
 import { gql } from "@apollo/client";
 
-import type{ IClient } from "../types/general";
-
-
+import type { IClient } from "../types/general";
 
 export interface GetClientsResponse {
-  getClients: {
-    pagination:any
-    data:IClient[]
+  getFilterClients: {
+    pagination: any;
+    data: IClient[];
   };
 }
 
 export interface GetClientsVars {
   userId: string;
-  filter:any;
-  pagination:any;
+  filter: any;
+  pagination: any;
 }
 
 export const GET_CLIENTS = gql`
-  query getClients($userId: ID!,$filter: ClientsFilter
-    $pagination: PaginationFilter) {
-    getClients(userId: $userId,filter: $filter
-      pagination: $pagination) {
-        pagination{
-            page
-            limit
-            totalPages
-            total
-            skip
-        }
-      data{
-        _id
-      name
-      nickname
-      
-      statics {
-        students
-        topics
-        assignments
-        sessions
-        events
+  query getFilterClients(
+    $userId: ID!
+    $filter: ClientsFilter
+    $pagination: PaginationFilter
+  ) {
+    getFilterClients(
+      userId: $userId
+      filter: $filter
+      pagination: $pagination
+    ) {
+      pagination {
+        page
+        limit
+        totalPages
+        total
+        skip
       }
+      data {
+        _id
+        name
+        lastname
+        address
+        phone
+        email
+        client_since
+        nickname
+        created_at
+        statics {
+          loans {
+          total
+          active
+          completed
+          canceled
+        }
+        payments {
+          total
+          pending
+          paid
+          expired
+          incomplete
+        }
+        }
       }
     }
   }
 `;
 
-export const GET_CLASSROOM = gql`
-  query getClassroom($classroomId: ID!) {
-    getClassroom(classroomId: $classroomId) {
+export const GET_CLIENT = gql`
+  query getClient($clientId: ID!) {
+    getClient(clientId: $clientId) {
       _id
       name
-      color
-      subject
+      lastname
+      address
+      phone
+      email
+      client_since
+      nickname
+      created_at
+      statics {
+        loans {
+          total
+          active
+          completed
+          canceled
+        }
+        payments {
+          total
+          pending
+          paid
+          expired
+          incomplete
+        }
+        amounts {
+        total_lent 
+        total_paid
+        client_debt
+       
+      }
       
-      stats{
-        students
-        topics
-        assignments
-        sessions
-        events
       }
     }
   }
 `;
 
-
-export interface GetClassroomResponse {
-  getClassroom: IClient;
+export interface GetClientResponse {
+  getClient: IClient;
 }
 
-export interface GetClassroomVars {
-  classroomId: string;
+export interface GetClientVars {
+  clientId: string;
 }

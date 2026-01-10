@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 /* import {
   PaymentIcon,
   UserIcon,
@@ -8,12 +8,13 @@ import { Link } from "react-router";
 } from "../../Icons"; */
 
 import { User, CreditCard, DollarSign, Star } from "lucide-react";
+import { useClientStore } from "../../store/client.store";
 
 const getReputationInfo = (score: number) => {
-  if (score >= 90) return { color: "bg-green-600", label: "buena" };
-  if (score >= 70) return { color: "bg-yellow-400", label: "aceptable" };
-  if (score >= 50) return { color: "bg-orange-400", label: "regular" };
-  if (score >= 30) return { color: "bg-red-500", label: "mala" };
+  if (score >= 90) return { color: "bg-green-300", label: "buena" };
+  if (score >= 70) return { color: "bg-yellow-300", label: "aceptable" };
+  if (score >= 50) return { color: "bg-orange-300", label: "regular" };
+  if (score >= 30) return { color: "bg-red-300", label: "mala" };
   console.log(score);
   if (score == 0) return "sin reputacion";
   return { color: "bg-red-900", label: "Basura" };
@@ -23,8 +24,17 @@ const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("es-ES", {}).format(value);
 };
 const ClientCard = ({ client }: { client: any }) => {
+  const clientsStre = useClientStore();
+  const navigate = useNavigate();
   return (
-    <div className="flex justify-between bg-blue-500 items-strech bg-primary p-4 rounded-2xl shadow-xl relative">
+    <div
+      onClick={() => {
+        clientsStre.selectClient(client);
+
+        navigate("/clients/" + client._id);
+      }}
+      className="flex justify-between    text-gray-800 items-strech  p-7 rounded-2xl shadow-xl relative border cursor-pointer border-gray-200 hover:bg-gray-50 hover:shadow-lg transition-shadow"
+    >
       {/* Izquierda: avatar, nombre, reputación */}
       <div className="flex items-start gap-4">
         <ReputationCol client={client}></ReputationCol>
@@ -39,26 +49,23 @@ const ClientCard = ({ client }: { client: any }) => {
   );
 };
 
-
 function ReputationCol({ client }: any) {
   const reputation: any = getReputationInfo(client.reputation || 100);
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center ">
       <div
-        className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center"
+        className="w-16 h-16 bg-gray-100 text-gray-500 border border-gray-200 rounded-xl flex items-center justify-center"
         title={`Reputación del cliente: ${client.reputation || 0}`}
       >
         <User />
       </div>
-      <span className=" flex items-center justify-center px-1 text-white   text-sm bg-green-600 rounded-md mt-3">
-        activo
-      </span>
+
       {/* Reputación */}
       <div
-        className="mt-2 flex flex-col items-center cursor-help"
+        className=" flex flex-col items-center cursor-help mt-2"
         title={`Reputación del cliente: ${client.reputation || 0}`}
       >
-        <div className="flex justify-center items-center  w-full  gap-1 text-white text-sm">
+        <div className="flex justify-center items-center  w-full  gap-1  text-sm">
           <Star
             className="text-yellow-300 "
             fill="yellow"
@@ -84,15 +91,15 @@ function Loans({ client }: any) {
   return (
     <div>
       <div
-        className="flex flex-col items-center bg-white text-gray-900 rounded-lg p-1 shadow-md cursor-help"
+        className="flex flex-col items-center bg-gray-100 border border-gray-200 text-gray-500 rounded-lg p-1 shadow-md cursor-help"
         title="Préstamos"
       >
         <DollarSign className="text-primary" width={24} height={24} />
         <div className="mt-1 text-sm font-semibold">
-          {client.total_completed_loans ?? 0} / {client.total_loans}0
+          {(client.statics.loans && client.statics.loans.completed) ?? 0} / {(client.statics.loans && client.statics.loans.total) ?? 0}
         </div>
-        <div className="flex flex-col justify-center items-center text-xs text-gray-700">
-          {client.total_active_loans ?? 0}
+        <div className="flex flex-col justify-center items-center text-xs text-gray-500">
+          {(client.statics.loans && client.statics.loans.active)?? 0}
           <span>activos</span>
         </div>
       </div>
@@ -106,59 +113,61 @@ function PaymentsName({ client }: any) {
     bgColor: string,
     tooltip: string
   ) => (
-    <div className="flex flex-col items-center text-white" title={tooltip}>
+    <div className="flex flex-col items-center " title={tooltip}>
       <CreditCard
-        className={`${bgColor} rounded-full p-1 mb-1 cursor-help`} // cursor para indicar tooltip
-        width={20}
-        height={20}
+        className={`${bgColor}  rounded-full p-1 mb-1 cursor-help`} // cursor para indicar tooltip
+        width={23}
+        height={23}
       />
-      <span className="font-semibold text-sm">{count}</span>
+      <span className=" text-sm">{count}</span>
     </div>
   );
 
+  console.log(client)
+
   return (
-    <div className="flex flex-col h-full justify-between">
-      <Link
-        to={`/clients/${client.id}`}
-        className="text-md font-bold text-white "
-      >
-        {client.nickname} nombre del cliente
-      </Link>
-      <span className="text-xs text-white">cliente desde 12/12/2024</span>
+    <div className="flex flex-col h-full justify-between text-gray-800">
+      <span onClick={() => {}} className="text-md   ">
+        {client.nickname}
+      </span>
+
+      <span className="text-sm text-gray-600">
+        cliente desde 
+        <span className="text-xs font-bold text-gray-500"> {client.client_since.split("T")[0]} </span>
+      </span>
+
       <div className="mt-3 flex gap-3">
         {renderPaymentStat(
-          client.total_expired_payments ?? 0,
-          "bg-red-500",
+         (client.statics.payments && client.statics.payments.expired) ?? 0,
+          "bg-red-200 text-red-500",
           "Pagos vencidos"
         )}
         {renderPaymentStat(
-          client.total_paid_payments ?? 0,
-          "bg-green-500",
+          (client.statics.payments && client.statics.payments.paid) ?? 0,
+          "bg-green-200 text-green-500",
           "Pagos pagados"
         )}
         {renderPaymentStat(
-          client.total_pending_payments ?? 0,
-          "bg-blue-500 border border-white",
+          (client.statics.payments && client.statics.payments.pending) ?? 0,
+          "bg-blue-200 border text-blue-500",
           "Pagos pendientes"
         )}
         {renderPaymentStat(
-          client.total_incomplete_payments ?? 0,
-          "bg-yellow-500",
+          (client.statics.payments && client.statics.payments.incomplete) ?? 0,
+          "bg-yellow-200 text-yellow-500",
           "Pagos incompletos"
         )}
       </div>
       <div className="flex gap-2 items-end  items-center ">
-        <p className="text-xs text-white">
+        {/* <p className="text-xs ">
           Deuda Total{" "}
           <span className="text-lg text-red-500 ">
-            ${formatCurrency(20000)}{" "}
+            ${formatCurrency(0)}{" "}
           </span>
-        </p>
+        </p> */}
       </div>
     </div>
   );
 }
-
-
 
 export default ClientCard;

@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 
+import Modal from "../Modal";
+import DeleteLoanModal from "../../pages/ClientDetail/DeleteLoanModal";
 //components
 /* import {
   SackDollar,
@@ -13,192 +15,155 @@ import Dropdown from "../../components/Dropdowns/Dropdown";
 
 import { Link } from "react-router";
 import Tooltip from "../ToolTip";
-import { Calendar, DollarSign } from "lucide-react";
-//utils
-//import { formatAmount } from "../../../common/funcs";
-//import { deleteLoan, setStatics } from "../../../redux/reducers/loans";
-//mport { setDebt, setTotalLendMoney } from "../../../redux/reducers/clients";
-//import { useDispatch, useSelector } from "react-redux";
-//import { useNotification } from "../../Notifications";
-/* import {
-  deleteLoanDb,
-  getLoanCurrentGains,
-  getLoanLeftToPay,
-} from "../../../pages/Loan/funcs"; */
-//import  loansService  from "../../../services/loansService";
-
+import { Calendar, DollarSign, Pencil, Trash2, MoreHorizontal, } from "lucide-react";
+import { BaselineAssignment, BaselineFactCheck } from "../payments/PaymentCard";
+import { useLoanStore } from "../../store/loan.store";
 
 export const formatAmount = (value: number): string => {
   return new Intl.NumberFormat("es-ES").format(value);
 };
 
-const LoanCard = ({ loan }) => {
 
- /*  const clients = useSelector((state) => state.clients);
-  const dispatch = useDispatch(); */
-  //const { setNotification, showNotification } = useNotification();
 
-/*   async function deleteLoanDb() {
-    try {
-      //await deleteLoanDb(loan.id);
-      //handleBack();
-      await deleteLoanDb(loan.id);
-      //await window.database.models.Loans.deleteLoan(loan.id)
-      
-      //dispatch(setDebt(clients.debt-(loan.amount+loan.gain)))
-      const leftToPaid = await getLoanLeftToPay(loan.id);
-      const loanGains = await getLoanCurrentGains(loan.id);
-      
-      
-      dispatch(deleteLoan({ id: loan.id }));
-      dispatch(
-        setStatics({
-          totalLoans:
-            clients.totalLoans > 1 ? clients.totalLoans - 1 : 0,
-          debt: clients.debt - leftToPaid,
-          totalLendMoney: clients.totalLendMoney - loan.amount,
-          bruteGains: clients.bruteGains - loanGains.brute,
-          netGains: clients.netGains - loanGains.net,
-        })
-      );
 
-      await window.database.models.ActivityLog.createActivity({
-        action_type: "DELETE",
-        entity: "loans",
-        entity_id: loan.id,
-        payload: JSON.stringify(loan),
-        synced: navigator.onLine ? 1 : 0,
-      });
+const LoanCard = ({ loan }: any) => {
+  const { setCurrentLoan, currentLoan } = useLoanStore();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-      setNotification({
-        type: "success",
-        message: "Prestamo eliminado con exito",
-      });
-      showNotification();
-    } catch (error) {
-      setNotification({
-        type: "danger",
-        message: "Error al borrar el prestamo " + error,
-      });
-      showNotification();
-    }
-  }
- */
- /*  async function deleteLoanApi() {
-    try {
-     // const aqui = await loansService.deletePrestamo(loan.id);
-      //console.log(aqui,"aqui")
-    } catch (error) {
-      setNotification({
-        type: "danger",
-        message: "Error al borrar el prestamo " + error,
-      });
-      showNotification();
-  }
-
-  }
- */
+  const totalPaid = loan.total_paid ?? 0;
+  const progress = Math.min(100, Math.round((loan.paid_amount / loan.total_amount) * 100));
+    const {updateFilterValue,filters} = usePaginationFilterStore()
+  
   return (
     <div
-      className={`w-full flex  gap-4 xsm:col-span-12
-     sm:col-span-12 md:col-span-12 
-     lg:col-span-6
-     xl:col-span-6
-${
-  loan.status === "active"
-    ? "bg-blue-500"
-    : loan.status === "completed"
-    ? "bg-green-500"
-    : "bg-red-500"
-} 
-shadow-2xl
-    text-white p-4 rounded-xl
-    relative
-    `}
+      data-active={currentLoan?._id === loan._id}
+        onClick={() => {
+        if (currentLoan?._id !== loan._id) {
+          setCurrentLoan(loan);
+          updateFilterValue("payments",{
+            ...filters.payments,
+            loanId:loan._id
+          })
+        } else {
+
+            setCurrentLoan(null);
+         updateFilterValue("payments",{
+            ...filters.payments,
+            loanId:""
+          })
+        }
+        
+       
+      }}
+      className={`
+        w-xl sm:w-md md:md lg:w-md
+        relative  p-4 rounded-xl text-white
+        transition-all duration-200
+        ${
+          loan.status === "active"
+            ? "bg-blue-500"
+            : loan.status === "completed"
+            ? "bg-green-500"
+            : "bg-red-500"
+        }
+        data-[active=true]:ring-4 data-[active=true]:ring-blue-800
+         text-white p-4 rounded-xl relative
+        transition-all duration-200 ease-in-out
+        ring-0 ring-transparent shadow-sm
+        data-[active=true]:shadow-xl
+        data-[active=true]:z-50
+        data-[active=true]:scale-[1.07]
+          `}
     >
-      <div className="flex flex-row gap-2 justify-center items-center ">
-        <DollarSign width={45} height={45} />
+      {/* MORE MENU */}
+      <div className="absolute top-4 right-4 z-50">
+        <button
+        title="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setMenuOpen(!menuOpen);
+          }}
+          className="p-1 rounded hover:bg-white/20"
+        >
+          <MoreHorizontal size={20} />
+        </button>
+
+        {menuOpen && (
+          <div className="absolute right-0 mt-2  bg-white text-gray-700 rounded-lg shadow-lg">
+            <OptionsDropDown></OptionsDropDown>
+          </div>
+        )}
       </div>
 
-      {/* Icono de fondo grande en el medio */}
-      <div className="absolute top-0 left-20 w-full h-full flex justify-center items-center opacity-20 z-0">
-        {/* {loan.status === "active" ? (
-          <BaselineAssignment width={200} height={200} />
-        ) : loan.status === "completed" ? (
-          <BaselineFactCheck width={200} height={200} />
-        ) : (
-          <BaselineAssignment width={200} height={200} />
-        )} */}
-        active
-      </div>
-      <div className="w-full flex flex-col gap-2 z-10">
-        <Link to={`/loans/${loan.id}`}>
-          <p className="text-lg font-bold text-gray-200 z-2">{loan.label}Perstamo</p>
-        </Link>
-        <h1 className="text-4xl font-bold pb-3">
+      {/* HEADER */}
+      <div className="flex gap-4 items-start">
+        {/* ICON + STATUS */}
+        <div className="flex flex-col items-center mt-2">
+          <div className="bg-white/30 rounded-lg p-2">
+            <DollarSign size={18} />
+          </div>
+          <span className="text-xs font-semibold mt-1 opacity-90">
+            {loan.status}
+          </span>
+        </div>
+
+        {/* LABEL + AMOUNT */}
+        <div className="flex-1 pr-12">
+         
+        <h1 className="text-3xl font-bold leading-tight mt-1">
           ${formatAmount(loan.amount)}
         </h1>
-        <div className="flex flex-row gap-2 justify-between">
-          <div className=" flex flex-row gap-2 items-center">
-            <Calendar width={20} height={20} />
-            <p className="text-sm">{loan?.loan_date}12/12/2012</p>
-          </div>
-          <span className="text-sm flex flex-row gap-2 items-center">
-            {loan.status === "active" ? (
-              <span className="text-md font-bold bg-blue-700 text-white rounded-md p-1 z-1">
-                activo
-              </span>
-            ) : loan.status === "completed" ? (
-              <span className="text-md font-bold bg-green-700 text-white rounded-md p-1 z-1">
-                completado
-              </span>
-            ) : (
-              <span className="text-md font-bold bg-red-500 text-white rounded-md p-1 z-1">
-                cancelado
-              </span>
-            )}
-          </span>
+
+       
+           <p className="flex gap-3 text-sm font-semibold opacity-90">
+            {loan.label}  <p className="text-sm text-green-200 font-semibold">
+          + ${formatAmount(loan.interest_amount)} interés
+        </p>
+          </p>
+
+
+          
         </div>
       </div>
 
-      {/*  <span
-        className="font-bold text-xl absolute top-0 right-4 
-        hover:cursor-pointer text-primary
-        "
-      >
-        ...
-      </span> */}
-     
-
-      <div className="flex flex-col justify-center  items-center mt-6">
-        <span className="text-lg font-bold rounded-full  bg-white text-black p-3">
-          <span className="text-sm font-bold text-success">
-            {loan?.paid ? loan?.paid : 0}
-          </span>
-          /{loan?.installment_number}10
+      {/* INTEREST + PERIOD */}
+      <div className="flex gap-4 text-sm mt-3 opacity-90">
+        <span>
+          Interés: <b>{loan.interest_rate}%</b>
         </span>
-        <br></br>
-        <div className="flex flex-row gap-2">
-          {loan.expired > 0 && (
-            <Tooltip
-              text={` pagos vencidos: ${loan.expired}`}
-              position="bottom"
-            >
-              <span className="rounded-full bg-danger p-2 text-xs px-2 py-1">
-                {loan.expired}
-              </span>
-            </Tooltip>
-          )}
-          {loan.incomplete > 0 && (
-            <Tooltip
-              text={` pagos incompletos: ${loan.incomplete}`}
-              position="bottom"
-            >
-              <span className="rounded-full bg-warning p-2 text-xs px-2 py-1">
-                {loan.incomplete}
-              </span>
-            </Tooltip>
-          )}
+        <span>
+          Período: <b>{loan.payment_interval}</b>
+        </span>
+        <div className="flex items-center gap-2 text-sm opacity-90 ">
+            <Calendar size={14} /> 
+            <b>{loan.disbursement_date.split("T")[0]}</b>
+          </div>
+      </div>
+
+      {/* PROGRESS */}
+      <div className="mt-4">
+        <div className="flex justify-between text-xs mb-1">
+          <span className="flex gap-3">Pagado
+
+            <b>{loan.paid_installments}/{loan.installment_number}</b>
+          </span>
+          <span>{progress}%</span>
+          
+        </div>
+
+        <div className="w-full h-2 bg-white/30 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-white transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        <div className="flex justify-between text-xs mt-1 opacity-90">
+          <div className="flex gap-5">
+            <span>${formatAmount(loan.paid_amount)} </span>
+            <span> deuda ${formatAmount(loan.left_amount)}</span>
+          </div>
+          <span>${formatAmount(loan.total_amount)}</span>
         </div>
       </div>
     </div>
@@ -208,7 +173,43 @@ shadow-2xl
 export default LoanCard;
 
 
+const OptionsDropDown = () => {
 
+
+
+  return (
+    
+      <ul className="">
+        <li>
+          <button
+            className="
+              flex items-center gap-3
+              w-full px-4 py-2
+              hover:bg-gray-100
+              transition
+            "
+          >
+            <Pencil size={16} className="text-gray-500" />
+            Editar
+          </button>
+        </li>
+        <DeleteLoanModal></DeleteLoanModal>
+        <li>
+         
+        </li>
+      </ul>
+  );
+};
+
+
+
+import { createPortal } from "react-dom";
+import { usePaginationFilterStore } from "../../store/pagination.filter";
+
+function DropdownPortal({children}:any) {
+  const portalRoot = document.getElementById("root");
+  return createPortal(children, portalRoot as Element);
+}
 /* 
  <DropdownDefault
         className={`font-bold text-xl absolute top-0 left-10 p-2 
@@ -239,3 +240,7 @@ export default LoanCard;
       </DropdownDefault>
 
 */
+
+
+
+

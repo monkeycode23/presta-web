@@ -1,25 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { Search, Plus, Eye, Phone, Mail } from "lucide-react";
+import { Search, Plus, Eye, Phone, Mail, User } from "lucide-react";
 import {
   initialClients,
   initialLoans,
   type Client,
   type Loan,
-} from "../types/general.d";
-import { AddClientModal } from "../components/clients/AddClientModal";
+} from "../../types/general.d";
+import { AddClientModal } from "./AddClientModal";
 import { Link, useNavigate } from "react-router";
-import ClientCard from "../components/clients/ClientCard";
+import ClientCard from "../../components/clients/ClientCard";
 import { gql } from "@apollo/client";
 import { useQuery, useLazyQuery } from "@apollo/client/react";
-import { useAuthStore } from "../store/auth.store";
+import { useAuthStore } from "../../store/auth.store";
 
-import { useClientStore } from "../store/client.store";
+import { useClientStore } from "../../store/client.store";
 
 import {
   GET_CLIENTS,
   type GetClientsResponse,
   type GetClientsVars,
-} from "../graphql/client.queries";
+} from "../../graphql/client.queries";
+import ClientsFilter from "./ClientsFilter";
+import Pagination from "../../components/Pagination";
+import { usePaginationFilterStore } from "../../store/PaginationFilter";
+import { formatCurrency } from "../../common/funcs";
 interface ClientListProps {
   clients: Client[];
   loans: Loan[];
@@ -29,7 +33,6 @@ interface ClientListProps {
 
 export function ClientList() {
   const [searchTerm, setSearchTerm] = useState("");
- 
 
   /*   { clients, loans, onViewClient, onAddClient }: ClientListProps */
   //const [clients, setClients] = useState(initialClients);
@@ -39,46 +42,58 @@ export function ClientList() {
   const authStore = useAuthStore();
   const { clients, setClients } = useClientStore();
 
+  const {pagination,filters,setTotal,setPage} = usePaginationFilterStore()
+
   const [_user, { data, loading, error }] = useLazyQuery<
     GetClientsResponse,
     GetClientsVars
   >(GET_CLIENTS, {
     fetchPolicy: "network-only", // 🔥
   });
+  
   useEffect(() => {
     if (!authStore.user) return;
 
     const fetch = async () => {
-      console.log(authStore.user);
+      console.log(filters);
       const response: any = await _user({
         variables: {
           userId: String(authStore.user!._id),
-          filter: {},
-          pagination: {},
+          filter: {
+            nickname: "",
+          },
+          pagination: {
+            page: 1,
+            limit: 10,
+          },
         },
       });
 
-      console.log("asdasldknasdj");
+      /* console.log("asdasldknasdj");
       console.log(response, "classroomss", data);
-
+ */
       if (data) {
-        setClients(data.getClients.data ?? []);
+        const {data:clients,pagination:_pagination } = data.getFilterClients;
+
+        setClients(clients ?? []);
+        setTotal(_pagination.total);
+        
       }
     };
 
-    if (!clients.length) fetch();
+    /*  if (!clients.length)  */ fetch();
 
     return () => {
       console.log("asdasdas");
     };
-  }, [authStore.user, data]);
+  }, [authStore.user, data, filters,pagination.page]);
 
-  const filteredClients =
+  /*   const filteredClients =
     clients.filter(
       (client) =>
         client.phone!.includes(searchTerm) ||
         client.email!.toLowerCase().includes(searchTerm.toLowerCase())
-    ) ?? [];
+    ) ?? []; */
 
   const getClientStats = (clientId: string) => {
     const clientLoans = loans.filter((l) => l.clientId === clientId);
@@ -105,14 +120,13 @@ export function ClientList() {
           <h2 className="text-gray-900 mb-2">Clientes</h2>
           <p className="text-gray-600">Gestiona tus clientes y sus préstamos</p>
         </div>
-         <AddClientModal
-        
-      />
-       
+        <AddClientModal />
       </div>
 
       {/* Búsqueda */}
-      <div className="bg-white rounded-xl p-4 border border-gray-200">
+     {/*  {
+        clients.length !==0 && (
+            <div className="bg-white rounded-xl p-4 border border-gray-200">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
@@ -124,22 +138,39 @@ export function ClientList() {
           />
         </div>
       </div>
+        )
+      } */}
 
+      <ClientsFilter></ClientsFilter>
+ 
+        {
+            pagination.total > pagination.pageSize && (
+                <Pagination
+                changePage={(page:number)=>{
+                    setPage(page)
+                }}
+                currentPage={pagination.page} totalPages={pagination.totalPages}></Pagination>
+            )
+        }
+       
       {/* Lista de clientes */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {clients.map((client) => {
-          const stats = getClientStats(client._id);
-          return <ClientCard key={client._id} client={client}></ClientCard>;
+          //const stats = getClientStats(client._id);
+          return <ClientCard key={client._id} client={client}></ClientCard>
+          
+         
+          
+          {/*  <Card key={client._id}  client={client}></Card> */};
         })}
       </div>
 
-      {filteredClients.length === 0 && (
-        <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
-          <p className="text-gray-500">No se encontraron clientes</p>
-        </div>
+      {clients.length === 0 && (
+       <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
+              <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500">No tienes clientes registrados </p>
+            </div>
       )}
-
-     
     </div>
   );
 }
@@ -147,7 +178,24 @@ export function ClientList() {
 {
   /* 
 
-<div key={client.id} className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+
+          );
+        }
+*/
+}
+
+
+
+
+ function Card({client}) {
+
+    const stats = {
+        totalLoans:0,
+        activeLoans:0,
+        totalDebt:0
+    }
+  return (
+    <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h3 className="text-gray-900 mb-1">{client.name}</h3>
@@ -185,8 +233,11 @@ export function ClientList() {
                 )}
               </div>
 
-              <button
-                onClick={() => { navigate("/clients/"+client.id) /* onViewClient(client.id) 
+                 <button
+                onClick={() => { 
+                    
+                   // navigate("/clients/"+client.id) 
+                }}/* onViewClient(client.id) */
                 className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
               >
                
@@ -195,8 +246,7 @@ export function ClientList() {
               
                 
               </button>
-            </div>
-          );
-        }
-*/
+          
+           </div>  
+  )
 }

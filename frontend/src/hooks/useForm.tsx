@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { type ZodSchema } from "zod";
-import useFormStore from "../store/form.store";
+import useFormStore from "../store/form2.store";
 import { request,type TRequestMethod} from "../services/api/request";
 import { toast } from "sonner";
 import { ZodError } from "zod";
@@ -31,12 +31,9 @@ export function useForm<T>({
   name,
   schema,
   initialValues,
-  onSubmit,
 }: UseZodFormProps<T>) {
+
   const {
-    inputs,
-    errors,
-    loading,
     setValue,
     setErrors,
     resetErrors,
@@ -45,28 +42,34 @@ export function useForm<T>({
     resetForm,
   } = useFormStore();
 
-  // inicializar form
-  useEffect(() => {
-    setForm({
-      name,
+  const form = useFormStore(
+    (s) => s.forms[name] ?? {
       inputs: initialValues,
       errors: {},
       loading: false,
-    });
+    }
+  );
 
-    return () => resetForm();
-  }, [name]);
+ useEffect(() => {
+  setForm(name, {
+    inputs: initialValues,
+    errors: {},
+    loading: false,
+  });
+
+  return () => {
+    resetForm(name);
+  };
+}, [name]);
 
   const validate = (): T | null => {
-    resetErrors();
+    resetErrors(name);
 
-    const result = schema.safeParse(inputs);
-
-    
+    const result = schema.safeParse(form.inputs);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = parseZodErrors(result.error);
-      setErrors(fieldErrors);
+      const fieldErrors = parseZodErrors(result.error);
+      setErrors(name, fieldErrors);
       return null;
     }
 
@@ -75,45 +78,44 @@ export function useForm<T>({
 
   const handleSubmit = async (
     query: { url: string; method: TRequestMethod },
-    onSuccess: any
+    onSuccess?: any
   ) => {
-    
     const data = validate();
-    if (!data){console.log(errors) ; return;}
+    if (!data) return;
 
     try {
-      /* if (!data) throw new Error("No data provided"); */
-      //set({ loading: true, errors: null });
+      setLoading(name, true);
 
       const response = await request({
-        url:query.url,
-        method:query.method,
-        data: data,
+        url: query.url,
+        method: query.method,
+        data,
       });
 
       if (!response.success) {
-         setErrors(response.errors);
-        throw new Error("Server Validation Error")
+        setErrors(name, response.errors);
+        return;
       }
-      const token = response.data.token;
-      
-      if(onSuccess) onSuccess(response.data)
-    } catch (error:any) {
-      console.error("Error en login:", error);
-      if(error.message == "Server Validation Error") return 
-     
-      toast.error("Lo siento error del servidor ")
 
+      onSuccess?.(response);
+    } catch(error:any) {
+
+        console.log(error)
+      toast.error("Lo siento, error del servidor");
     } finally {
-      setLoading(false);
+      setLoading(name, false);
     }
   };
 
+  const setFieldValue = (key: string, value: any) => {
+    setValue(name, key, value);
+  };
+
   return {
-    values: inputs as T,
-    errors,
-    loading,
-    setValue,
+    values: form.inputs as T,
+    errors: form.errors,
+    loading: form.loading,
+    setValue: setFieldValue,
     handleSubmit,
   };
 }

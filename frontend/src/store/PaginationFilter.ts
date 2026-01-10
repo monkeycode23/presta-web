@@ -35,7 +35,7 @@ export interface PaginationFilterStore {
   setPage: (page: number) => void;
   setPageSize: (size: number) => void;
   setTotal: (total: number) => void;
-
+    setTotalPages :(total: number) => void;
   setFilters: (filters: Partial<any>) => void;
   resetFilters: () => void;
 
@@ -67,10 +67,22 @@ export const usePaginationFilterStore = create<PaginationFilterStore>((set) => (
       pagination: { ...state.pagination, pageSize, page: 1 },
     })),
 
-  setTotal: (total) =>
+    setTotalPages: (total) =>
     set((state) => ({
-      pagination: { ...state.pagination, total },
+      pagination: { ...state.pagination, totalPages: total },
     })),
+
+  setTotal: (total) =>
+    set((state) => {
+        const {total,pageSize} = state.pagination
+        const totalPages = 
+        total>pageSize ? 
+        Math.ceil(pageSize/total) :1
+
+        return ({
+      pagination: { ...state.pagination, total,totalPages },
+    })
+    }),
 
   setFilters: (filters) =>
     set((state) => ({

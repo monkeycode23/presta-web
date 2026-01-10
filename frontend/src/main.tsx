@@ -6,6 +6,7 @@ import './index.css'
  import { ApolloProvider } from "@apollo/client/react"; 
 
   import { ApolloClient,  InMemoryCache, HttpLink } from "@apollo/client";
+import { Toaster } from 'sonner';
 
  const httpLink = new HttpLink({
     uri: "http://localhost:2567/graphql",
@@ -59,6 +60,7 @@ import './index.css'
      /*  <ApolloProvider client={client}> */
        <ApolloProvider client={client}> 
         <App />
+         <Toaster />
       </ApolloProvider>  
     );
     

@@ -8,7 +8,7 @@ export const CreateClientSchema = z.object({
     .string()
     .min(3, { message: "El nombre debe tener al menos 3 caracteres." })
     .max(30, { message: "El nombre no debe tener más de 30 caracteres." })
-    .regex(/^[a-zA-Z0-9 ]+$/, "Solo caracteres alfanuméricos y espacios"),
+    .regex(/^[a-zA-Z0-9ñ ]+$/, "Solo caracteres alfanuméricos y espacios"),
 
   email: z
     .string()

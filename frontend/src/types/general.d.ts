@@ -9,6 +9,157 @@ export interface User {
   roles: string[];
 }
 
+
+// types/payment.ts
+export enum PaymentMethod {
+  CASH = "cash",
+  TRANSFER = "transfer",
+  CREDIT_CARD = "credit_card",
+  CHECK = "check",
+  MERCADO_PAGO = "mercado_pago",
+  OTHER = "other",
+}
+
+export enum PaymentStatus {
+  PENDING = "pending",
+  PAID = "paid",
+  EXPIRED = "expired",
+  INCOMPLETE = "incomplete",
+  CANCELLED = "cancelled",
+  REFUNDED = "refunded",
+  FAILED = "failed",
+}
+
+export interface PaymentReceipt {
+  public_id: string;
+  url: string;
+  filename?: string;
+  uploadedAt: string;
+}
+
+export interface IPayment {
+  _id: string;
+  label?: string;
+
+  loan: ILoan;
+    client:IClient
+  interest_amount: number;
+  gain: number;
+  total_amount: number;
+
+  payment_date: string;
+  paid_date?: string;
+  due_date?: string;
+
+  net_amount: number;
+  amount: number;
+
+  status: string;
+
+  left_amount?: number;
+  paid_amount?: number;
+  incomplete_amount?: number;
+
+  payment_method: string;
+
+  installment_number: number;
+
+  late_fee: number;
+  late_days: number;
+
+  receipt_number?: string;
+  transaction_id?: string;
+  notes?: string;
+
+  processed_by?: string;
+  user_id?: string;
+
+  comprobantes: PaymentReceipt[];
+
+  created_at: string;
+  updated_at: string;
+}
+
+
+// types/loan.ts
+export type LoanStatus =
+  | 'Pendiente'
+  | 'pending'
+  | 'active'
+  | 'completed'
+  | 'cancelled'
+  | 'refounded'
+  | 'Aprobado'
+  | 'Rechazado'
+  | 'En curso'
+  | 'Pagado'
+  | 'Vencido'
+  | 'Cancelado';
+
+export type PaymentInterval =
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'fortnightly'
+  | 'fortnigt'
+  | 'yearly'
+  | 'custom'
+  | 'unique'
+  | 'Diario'
+  | 'Semanal'
+  | 'Quincenal'
+  | 'Mensual'
+  | 'Personalizado';
+
+export interface ILoan {
+  _id: string;
+  label?: string;
+
+  client: string;
+  user?: string;
+
+  amount: number;
+  gain?: number;
+  interest_amount: number;
+  interest_rate: number;
+
+  installment_number: number;
+  total_amount: number;
+
+  loan_date?: string;
+  disbursement_date?: string;
+
+  paid_installments?: number;
+  paid_amount: number;
+  left_amount?: number;
+
+  first_payments_date?: string;
+  generate_payments_date?: string;
+
+  term?: string;
+  status: LoanStatus;
+  payment_interval: PaymentInterval;
+
+  description?: string;
+  purpose?: string;
+  collateral?: string;
+
+  next_payment_date?: string;
+  last_payment_date?: string;
+
+  payment_due_day?: number;
+
+  late_fee_rate: number;
+  late_fee_amount: number;
+
+  notes?: string;
+
+  payments: string[];
+
+  created_at: string;
+  updated_at: string;
+}
+
 export interface IClient {
   _id: string;
   nickname: string;

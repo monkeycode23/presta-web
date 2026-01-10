@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Plus, X } from "lucide-react";
-import type { Client } from "../../types/general.d";
-import Modal from "../Modal";
+import type { Client } from "../../types/general";
+import Modal from "../../components/Modal";
 import { useForm } from "../../hooks/useForm";
 import { CreateClientSchema } from "../../errors/schemas/client.schema";
-
+import { useClientStore } from "../../store/client.store";
+import { toast } from "sonner";
 interface AddClientModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -15,9 +16,10 @@ export function AddClientModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
 
-
+  const MODAL_NAME ="ADD_CLIENT"
+    const clientStore = useClientStore(); 
   const {values,errors,loading,setValue,handleSubmit} = useForm({
-    name:"ADD_CLIENT",
+    name:MODAL_NAME,
     schema:CreateClientSchema,
     initialValues:{
     name: "",
@@ -38,6 +40,12 @@ export function AddClientModal() {
     },(data:any)=>{
 
         console.log(data)
+
+        clientStore.addClient(data.data)
+
+        toast.success("Cliente registrado exitosamente")
+
+        setIsModalOpen(false)
     })
     // onAdd(formData);
    // setFormData({ name: "", phone: "", email: "", address: "" });

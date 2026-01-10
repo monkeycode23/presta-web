@@ -10,7 +10,10 @@ import {
   CheckCircle,
   AlarmClock,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  Phone,
+  Mail
 } from 'lucide-react';
 
 import { usePaginationFilterStore } from '../../store/PaginationFilter';
@@ -18,11 +21,29 @@ import { usePaginationFilterStore } from '../../store/PaginationFilter';
  import Checkbox from '../../components/ui/form/input/Checkbox';
 import Radio from '../../components/ui/form/input/Radio'; 
 
+
+
+const KeyNameMap:any = {
+  payments: {
+    pagadas: "paid",
+    expiradas: "expired",
+    pendientes: "pending",
+    incompletas: "incomplete",
+  },
+
+  loans: {
+    "En-curso": "active",
+    Completado: "completed",
+    Cancelado: "canceled",
+    Pendiente: "pending",
+  },
+};
 const cuotaEstados = ['pagadas', 'expiradas', 'pendientes', 'incompletas'];
 
 
+
 const estadoPrestamos =[
-  "En curso",
+  "En-curso",
   "Completado",
   "Cancelado",
   "Pendiente",
@@ -64,7 +85,7 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
 
 
   const updateFiltro = (clave:any, valor:any) => {
-    setFiltrosActivos((prev) => {
+    setFiltrosActivos((prev:any) => {
       const nuevos:any = { ...prev };
       if (valor === '' || (Array.isArray(valor) && valor.length === 0)) {
         delete nuevos[clave];
@@ -76,7 +97,7 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
   };
 
   // Nombre
-  const handleNombreChange = (e) => {
+  const handleNombreChange = (e:any) => {
     const value = e.target.value;
     setNombre(value);
     updateFiltro('nombre', value);
@@ -103,7 +124,7 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
     });
   };
   // Estado de cuotas múltiple
-  const toggleEstadoCuota = (estado) => {
+  const toggleEstadoCuota = (estado:any) => {
     const nuevaLista = estadoCuotasSeleccionadas.includes(estado)
       ? estadoCuotasSeleccionadas.filter((e) => e !== estado)
       : [...estadoCuotasSeleccionadas, estado];
@@ -120,7 +141,7 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
   };
 
   // Cantidad de préstamos
-  const handleCantidadChange = (e) => {
+  const handleCantidadChange = (e:any) => {
     const value = e;
 
    
@@ -137,7 +158,7 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
     const nuevos:any = { ...filtrosActivos };
 
     if (clave === 'estadoCuota' && valor) {
-      const nuevaLista = nuevos.estadoCuota.filter((e) => e !== valor);
+      const nuevaLista = nuevos.estadoCuota.filter((e:any) => e !== valor);
       if (nuevaLista.length > 0) {
         nuevos.estadoCuota = nuevaLista;
       } else {
@@ -149,7 +170,7 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
       if (clave === 'nombre') {
         setNombre('');
       } else if (clave === 'cantidadPrestamos') {
-        setCantidadPrestamos('');
+        setCantidadPrestamos(0);
       } else if (clave === 'estadoCuota') {
         setEstadoCuotasSeleccionadas([]);
       }
@@ -159,7 +180,7 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
   };
 
   return (
-    <div className="w-full  mx-auto p-4 dark:bg-gray-900 dark:border-gray-800">
+    <div className="w-full  mx-auto p-4 bg-white dark:bg-gray-900 dark:border-gray-800">
       {/* Input + botón de filtros */}
       <div className="flex gap-2 items-center">
         <input
@@ -189,8 +210,8 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
             <label key={estado} className="flex items-center gap-2 mb-1 cursor-pointer">
               <Checkbox
                
-                checked={estadoCuotasSeleccionadas.includes(estado)}
-                onChange={() => toggleEstadoCuota(estado)}
+                checked={estadoCuotasSeleccionadas.includes(KeyNameMap.payments[estado])}
+                onChange={() => toggleEstadoCuota(KeyNameMap.payments[estado])}
               />
               <span className="flex items-center gap-1 capitalize">
                 {estadoIcons[estado]} {estado}
@@ -205,8 +226,8 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
               estadoPrestamos.map((estado,index)=>(
               <label key={index} className="flex items-center gap-2 mb-1 cursor-pointer">
               <Checkbox
-                checked={estadoPrestamoSeleccionadas.includes(estado)}
-                onChange={() => toggleEstadoPrestamo(estado)}
+                checked={estadoPrestamoSeleccionadas.includes(KeyNameMap.loans[estado])}
+                onChange={() => toggleEstadoPrestamo(KeyNameMap.loans[estado])}
               />
               <span className="flex items-center gap-1 capitalize">
                 {estadoIcons[estado]} {estado}
@@ -217,7 +238,7 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
           </div>
           
           {/* Columna: Cantidad de préstamos */}
-          <div className=''>
+         {/*  <div className=''>
             <h3 className="font-semibold mb-2">Prestamos Activos</h3>
             {
               cantidadPrestamosValues.map((cant,index)=>(
@@ -228,12 +249,12 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
                 onChange={handleCantidadChange}
                 ></Radio>
                 <span className="flex items-center gap-1 capitalize">
-                {/* estadoIcons[estado] */} {cant ==0 ? "Sin Prestamos" : cant == 5 ? "5 o mas": cant == 1 ? "1 o mas" : cant ==3 ? "3 o mas" : cant  }
+                {cant ==0 ? "Sin Prestamos" : cant == 5 ? "5 o mas": cant == 1 ? "1 o mas" : cant ==3 ? "3 o mas" : cant  }
               </span>
               </label>
               ))
             }
-          </div>
+          </div> */}
         </div>
       )}
 
@@ -245,14 +266,14 @@ const cantidadPrestamosValues =["sin prestamos activos",1,3,5]
           </Tag>
         )}
         {filtrosActivos.estadoPrestamo &&
-          filtrosActivos.estadoPrestamo.map((estado) => (
+          filtrosActivos.estadoPrestamo.map((estado:any) => (
             <Tag key={estado} color="orange" onClose={() => quitarFiltro('estadoPrestamo', estado)}>
               Prestamo: {estado}
             </Tag>
           ))}
 
         {filtrosActivos.estadoCuota &&
-          filtrosActivos.estadoCuota.map((estado) => (
+          filtrosActivos.estadoCuota.map((estado:any) => (
             <Tag key={estado} color="green" onClose={() => quitarFiltro('estadoCuota', estado)}>
               Cuota: {estado}
             </Tag>
@@ -280,7 +301,9 @@ const Tag = ({ children, onClose, color }:any) => {
   return (
     <div className={`flex items-center px-3 py-1 rounded-full text-sm ${colorMap[color] || 'bg-gray-200 text-gray-800'}`}>
       <span className="mr-2">{children}</span>
-      <button onClick={onClose} className="hover:text-red-600">
+      <button
+      title='button'
+      onClick={onClose} className="hover:text-red-600">
         <X className="w-4 h-4" />
       </button>
     </div>
@@ -290,3 +313,5 @@ const Tag = ({ children, onClose, color }:any) => {
 
 
 export default ClientsFilter
+
+
