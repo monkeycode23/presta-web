@@ -115,10 +115,12 @@ class PaymentService {
     // console.log(query,payments,pagination,"payments")
     return payments;
   }
+  
+  
   async getPayments(args: any) {
     const { filter, pagination } = args;
 
-    const { loanId, status, payment_date, clientId } = filter;
+    const { loanId, status, payment_date, clientId,client } = filter;
 
     //const total = await Payment.countDocuments();
 
@@ -129,6 +131,22 @@ class PaymentService {
 
     const query: any = {};
 
+  const escapeRegex = (text:string) =>
+  text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+let clientIds: any[] = [];
+
+if (client?.length) {
+  clientIds = await Client.find({
+    nickname: { $regex: "^" + escapeRegex(client), $options: "i" }
+  }).distinct("_id");
+
+
+}
+
+if (clientIds.length) {
+  query.client = { $in: clientIds };
+}
     if (clientId.length) query.client = clientId;
 
     if (loanId.length) query.loan = loanId;

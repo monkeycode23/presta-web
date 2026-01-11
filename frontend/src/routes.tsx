@@ -7,8 +7,12 @@ import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import { ClientList } from "./pages/Clients";
 import { PaymentsCalendar } from "./pages/Payments/index";
-import { EmployeeManagement } from "./pages/Employee";
+import { EmployeeManagement } from "./pages/Employee/index";
 import { ClientDetail } from "./pages/ClientDetail/index";
+
+import { Settings } from "./pages/Settings";
+import { Reports } from "./pages/Statics";
+import { Profile } from "./pages/Profile";
 
 const router = createBrowserRouter([
     {
@@ -49,6 +53,19 @@ const router = createBrowserRouter([
       {
         path: "/employees",
         element: <EmployeeManagement />,
+      },
+
+       {
+        path: "/settings",
+        element: <Settings />,
+      },
+       {
+        path: "/statics",
+        element: <Reports />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
       },
     ],
   },

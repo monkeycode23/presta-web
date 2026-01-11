@@ -1,7 +1,9 @@
 import React,{useState} from 'react'
 import { LayoutDashboard, School, Calendar, Bell, Settings, Menu, X,FilterX,FileText, Users, DollarSign, ChartBar, User2, User2Icon, WorkflowIcon, UserCheck2 } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useAppSettingsStore } from '../../../store/app.settings.store';
+
+
 export default function Sidebar() {
 
       const { isSidebarExpanded, isSidebarHovered, isSidebarMobileOpen,toggleSidebar} = useAppSettingsStore();
@@ -11,6 +13,7 @@ export default function Sidebar() {
    
     const selectedClassroom = "";
   
+    const navigate = useNavigate()
   
     return (
     
@@ -108,7 +111,13 @@ export default function Sidebar() {
         </nav>
 
         <div className="p-4 border-t border-gray-200">
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100">
+          <button 
+          onClick={()=>{
+
+            navigate("/settings")
+            setCurrentView("settings")
+          }}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100">
             <Settings className="w-5 h-5" />
             {isSidebarExpanded && <span>Configuración</span>}
           </button>

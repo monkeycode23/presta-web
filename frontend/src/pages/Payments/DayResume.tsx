@@ -1,30 +1,36 @@
 
 
 
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { formatCurrency } from '../../common/funcs';
 import { usePaymentStore } from '../../store/payment.store';
-import { usePaginationFilterStore } from '../../store/PaginationFilter';
+import { usePaginationFilterStore } from '../../store/pagination.filter';
 
 export default function DayResume() {
+
+
 
     const {payments:_,paymentsStatus} = usePaymentStore()
     const {filters} = usePaginationFilterStore()
     
     const {payments_date} = filters;
 
-    const selectedDate = payments_date ?  payments_date.payments_date?.exact : new Date() 
+    console.log(filters)
 
+    const selectedDate = payments_date ?  payments_date.payment_date?.exact : new Date() 
+
+        console.log(selectedDate,"asdlakshdkajsdh")
 const selectedDatePayments = paymentsStatus.find((p)=>{
 
     console.log(selectedDate)
-    return p._id == selectedDate.toISOString().split("T")[0]
+    return p._id == selectedDate.split("T")[0]
 })
 
       const selectedDateStats = {
     total: selectedDatePayments?.total ?? 0,
     pagadas: selectedDatePayments?.paid ?? 0,
+     incompletos: selectedDatePayments?.incomplete ?? 0,
     vencidas: selectedDatePayments?.expired ?? 0,
     pendientes: selectedDatePayments?.pending ?? 0,
     totalAmount:selectedDatePayments?.totalAmount ?? 0
@@ -34,33 +40,42 @@ const selectedDatePayments = paymentsStatus.find((p)=>{
       .reduce((sum, p) => sum + p.amount, 0), */
   };
 
+
+  useEffect(() => {
+    
+  
+    return () => {
+      
+    }
+  }, [])
+  
+
   return (
      <div className="lg:col-span-2 space-y-4">
           {/* Resumen del día */}
           <div className="bg-white rounded-xl p-6 border border-gray-200">
             <h3 className="text-gray-900 mb-4">
-               {selectedDate && selectedDate.toLocaleDateString("es-ES", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
+               {selectedDate && selectedDate} ({selectedDateStats.total})
             </h3>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-blue-50 rounded-lg p-3">
-                <p className="text-xs text-gray-600 mb-1">Total Pagos</p>
-                <p className="text-gray-900">{selectedDateStats.total}</p>
-              </div>
-              <div className="bg-green-50 rounded-lg p-3">
-                <p className="text-xs text-gray-600 mb-1">Pagadas</p>
-                <p className="text-green-600">{selectedDateStats.pagadas}</p>
-              </div>
-              <div className="bg-yellow-50 rounded-lg p-3">
+                 <div className="bg-blue-50 rounded-lg p-3">
                 <p className="text-xs text-gray-600 mb-1">Pendientes</p>
-                <p className="text-yellow-600">
+                <p className="text-blue-600">
                   {selectedDateStats.pendientes}
                 </p>
               </div>
+               <div className="bg-green-50 rounded-lg p-3">
+                <p className="text-xs text-gray-600 mb-1">Pagadas</p>
+                <p className="text-green-600">{selectedDateStats.pagadas}</p>
+              </div>
+
+              <div className="bg-yellow-50 rounded-lg p-3">
+                <p className="text-xs text-gray-600 mb-1">Incompletos</p>
+                <p className="text-yellow-900">{selectedDateStats.incompletos}</p>
+              </div>
+             
+             
               <div className="bg-red-50 rounded-lg p-3">
                 <p className="text-xs text-gray-600 mb-1">Vencidas</p>
                 <p className="text-red-600">{selectedDateStats.vencidas}</p>

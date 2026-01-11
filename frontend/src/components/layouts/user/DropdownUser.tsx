@@ -1,38 +1,38 @@
 import React,{ useState } from 'react';
-import { Link } from 'react-router-dom';
-import ClickOutside from '../ClickOutside';
-import UserOne from '../../images/user/user-01.png';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch,useSelector } from 'react-redux';
-import { logout } from '../../redux/reducers/auth';
+import { Link } from 'react-router';
+
+import UserOne from '../../../images/user/user-01.jpg';
+import { useNavigate } from 'react-router';
+
 
 const DropdownUser = () => {
 
-  const user = useSelector(state => state.auth.user);
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+
   
   
   function userLogout(){
     
-    dispatch(logout())
+   /*  dispatch(logout())
     
 
-    navigate("/auth/singin")
+    navigate("/auth/singin") */
   }
 
+  const user ={}
   
   return (
-    <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
+   /*  <ClickOutside onClick={() => setDropdownOpen(false)} className="relative"> */
+   <>
       <Link
         onClick={() => setDropdownOpen(!dropdownOpen)}
         className="flex items-center gap-4"
         to="#"
       >
         <span className="hidden text-right lg:block">
-          <span className="block text-sm font-medium text-black dark:text-white">
-            {user?.username}
+          <span className="block text-sm font-medium text-black ">
+            {user?.username} user12
           </span>
           <span className="block text-xs">Admin</span>
         </span>
@@ -61,7 +61,7 @@ const DropdownUser = () => {
       {/* <!-- Dropdown Start --> */}
       {dropdownOpen && (
         <div
-          className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
+          className={`absolute right-5 top-10 mt-4 flex w-62.5 flex-col rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
         >
           <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
@@ -139,7 +139,7 @@ const DropdownUser = () => {
         </div>
       )}
       {/* <!-- Dropdown End --> */}
-    </ClickOutside>
+   </>
   );
 };
 

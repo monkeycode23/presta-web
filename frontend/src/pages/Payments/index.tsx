@@ -37,6 +37,7 @@ export function PaymentsCalendar() {
         status:[],
          clientId:"",
          loanId:"",
+         client:"",
         order:"newest",
         payment_date:{
             to:"",
@@ -65,7 +66,7 @@ export function PaymentsCalendar() {
           
           filter: filters.payments_date,
           pagination: {
-            page: 1,
+            page: pagination.payments_date.page,
             limit: 5,
           },
         },

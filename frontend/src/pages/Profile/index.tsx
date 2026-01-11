@@ -15,11 +15,16 @@ interface ProfileProps {
   onUpdateProfile: (profile: LenderProfile) => void;
 }
 
-export function Profile({ profile, onUpdateProfile }: ProfileProps) {
+export function Profile() {
+
+    const profile:any={}
+    
+     
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<LenderProfile>(profile);
   const [imagePreview, setImagePreview] = useState<string | undefined>(profile.profileImage);
 
+  
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -30,6 +35,10 @@ export function Profile({ profile, onUpdateProfile }: ProfileProps) {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const  onUpdateProfile = (e: React.FormEvent) => {
+    
   };
 
   const handleSubmit = (e: React.FormEvent) => {

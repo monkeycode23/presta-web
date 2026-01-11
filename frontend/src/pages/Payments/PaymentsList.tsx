@@ -1,5 +1,3 @@
-
-
 import {
   ChevronLeft,
   ChevronRight,
@@ -8,6 +6,9 @@ import {
   Clock,
   User,
   DollarSign,
+  Pencil,
+  Trash2,
+  Eye,
 } from "lucide-react";
 
 import { formatCurrency } from "../../common/funcs";
@@ -15,48 +16,60 @@ import { usePaymentStore } from "../../store/payment.store";
 import PaymentFilterDropdown from "./FilterPayments";
 import { usePaginationFilterStore } from "../../store/pagination.filter";
 import Pagination from "../../components/Pagination";
-
+import Dropdown from "../../components/Dropdowns/Dropdown";
+import PayPaymentModal from "../ClientDetail/PayPaymentModal";
 
 export function PaymentsList() {
+  const { payments, paymentsStatus } = usePaymentStore();
 
-    const {payments} = usePaymentStore()
-   
-   
-   
-   
-   
-   
-   const {filters,pagination,setPage} = usePaginationFilterStore()
+  const { filters, pagination, setPage } = usePaginationFilterStore();
 
-   
+  const paymentStatusDate = paymentsStatus.find((p) => {
+    const currentDate = filters.payments_date.payment_date.exact;
+
+    console.log(currentDate);
+    return currentDate == p._id;
+  });
+
+  console.log(paymentStatusDate);
 
   return (
     <>
       {/* Pagos del día */}
-      {payments.length > 0   ? (
+      {paymentStatusDate?.total ? (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex justify-between text-md ">
-            <div >
-            <h3 className="text-gray-900 mb-4 text-md font-normal">
-            Pagos del día ({payments.length})
-          </h3>
-            <PaymentFilterDropdown></PaymentFilterDropdown>
-          </div>
-          
-          {
-            pagination.payments_date.total > pagination.payments_date.pageSize &&
-            
-            (<Pagination 
-          name={"payments_date"}
-           currentPage={pagination.payment_date?.page}
-          totalPages={pagination.payment_date?.totalPages}
-            changePage={(page:number)=>setPage(page,"payments_date")}
-          ></Pagination>)
-          }
+            <div className="w-full">
+              <div className=" flex justify-between  text-gray-900 mb-4 text-md font-normal">
+                <span> Pagos del día ({payments.length})</span>
+
+                <div>
+                  {pagination.payments_date.total >
+                    pagination.payments_date.pageSize && (
+                    <Pagination
+                      name={"payments_date"}
+                      currentPage={pagination.payment_date?.page}
+                      totalPages={pagination.payment_date?.totalPages}
+                      changePage={(page: number) =>
+                        setPage(page, "payments_date")
+                      }
+                    ></Pagination>
+                  )}
+                </div>
+              </div>
+              <PaymentFilterDropdown></PaymentFilterDropdown>
+            </div>
           </div>
           <div className="space-y-3">
+            {!payments.length && (
+              <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
+                <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">
+                  No se encontraron pagos programados
+                </p>
+              </div>
+            )}
 
-            
             {payments.map((payment: any) => {
               const loan = payment.loan;
               const client = payment.client;
@@ -73,7 +86,9 @@ export function PaymentsList() {
                           ? "bg-green-100"
                           : payment.status === "expired"
                           ? "bg-red-100"
-                          :payment.status === "pending" ?  "bg-blue-100" : "bg-yellow-100"
+                          : payment.status === "pending"
+                          ? "bg-blue-100"
+                          : "bg-yellow-100"
                       }`}
                     >
                       {payment.status === "paid" && (
@@ -85,7 +100,7 @@ export function PaymentsList() {
                       {payment.status === "pending" && (
                         <Clock className="w-5 h-5 text-blue-600" />
                       )}
-                       {payment.status === "incomplete" && (
+                      {payment.status === "incomplete" && (
                         <Clock className="w-5 h-5 text-yellow-600" />
                       )}
                     </div>
@@ -117,38 +132,64 @@ export function PaymentsList() {
                             ? "bg-green-100 text-green-800"
                             : payment.status === "expired"
                             ? "bg-red-100 text-red-800"
-                            : payment.status === "pending" ? "bg-yellow-100 text-blue-800": "bg-yellow-100 text-yellow-800"
+                            : payment.status === "pending"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
                         {payment.status === "paid"
                           ? "Pagada"
                           : payment.status === "vencida"
                           ? "Vencida"
-                          : payment.status === "pending" ? "Pendiente": "Incompleta"} 
+                          : payment.status === "pending"
+                          ? "Pendiente"
+                          : "Incompleta"}
                       </span>
                     </div>
                   </div>
 
-                  {payment.status !== "paid" && (
+                  <Dropdown right top={30}>
+                    <div className="flex  gap-2 p-2">
+                      {payment.status !== "paid" && (
+                        <PayPaymentModal payment={payment} />
+                      )}
+                      <button className="text-sm hover:text-yellow-600 flex gap-1">
+                        editar <Pencil width={14} />
+                      </button>
+                      <button className="text-sm hover:text-red-600 flex gap-1">
+                        eliminar <Trash2 width={14} />
+                      </button>
+                      <button className="text-sm hover:text-gray-600 flex gap-1">
+                        ver <Eye width={14} />
+                      </button>
+                    </div>
+                  </Dropdown>
+                  {/*   {payment.status !== "paid" && (
                     <button
-                      onClick={() => {/* onPaymentUpdate(payment.id) */}}
+                      onClick={() => {
+                        /* onPaymentUpdate(payment.id) 
+                      }}
                       className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                     >
                       Marcar Pagada
                     </button>
-                  )}
+                  )} */}
                 </div>
               );
             })}
           </div>
         </div>
       ) : (
-       <div></div>
+        <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
+          <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500">
+            No hay pagos programados para esta fecha
+          </p>
+        </div>
       )}
     </>
   );
 }
-
 
 function Calendar({ className }: { className?: string }) {
   return (

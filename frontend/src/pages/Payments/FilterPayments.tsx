@@ -46,12 +46,10 @@ const STATUS_OPTIONS = [
 
 function PaymentFilterDropdown() {
   const [open, setOpen] = useState(false);
-  const [status, setStatus] = useState([]);
-  const [order, setOrder] = useState("newest");
-
+  
   const {filters,updateFilterValue} = usePaginationFilterStore()
 
-  const payments_date = filters.playments_date
+  const payments_date = filters.payments_date
 
   const quitarFiltro = (clave: any, value :any) => {
     
@@ -62,6 +60,14 @@ function PaymentFilterDropdown() {
         console.log(newState)
         updateFilterValue("payments_date",{
             status: newState
+        })
+        
+    }
+
+    if(clave == "cliente"){
+       
+        updateFilterValue("payments_date",{
+            client: ""
         })
         
     }
@@ -78,7 +84,7 @@ function PaymentFilterDropdown() {
         console.log(filters.payments_date)
     }
   return (
-    <div className="relative ">
+    <div className="relative mb-2">
       <div className="flex gap-4 ">
 
            <button
@@ -89,11 +95,20 @@ function PaymentFilterDropdown() {
           Filtros
         </button>
         <div className=" flex flex-wrap gap-2">
-          {payments_date?.order && (
+          { payments_date?.order && (
             <Tag color="blue" >
               orden: {payments_date.order}
             </Tag>
           )}
+          { payments_date?.client.length ? (
+            <Tag color="purple"
+            
+            onClose={() => quitarFiltro("cliente",null)}
+            >
+              cliente: {payments_date.client}
+              
+            </Tag>
+          ) : (<></>)}
           {payments_date?.status &&
             payments_date.status.map((estado: any) => (
               <Tag
@@ -140,6 +155,22 @@ const FilterPane = ({setOpen,toggleStatus}:any)=>{
           "
         >
           <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+             <div className="col-span-2">
+              <h4 className="text-sm font-semibold mb-2">Cliente</h4>
+              <div className="space-y-2">
+                <input
+              type="text"
+              value={payments_date.client}
+              onChange={(e) => updateFilterValue("payments_date",{
+                        ...payments_date,
+                        client:e.target.value
+                    })}    
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="nombre del cliente"
+            />
+              </div>
+            </div>
             {/* ESTADO */}
             <div>
               <h4 className="text-sm font-semibold mb-2">Estado</h4>
@@ -170,7 +201,7 @@ const FilterPane = ({setOpen,toggleStatus}:any)=>{
                     type="radio"
                     name="order"
                     checked={payments_date.order === "newest"}
-                    onChange={() => updateFilterValue("loans",{
+                    onChange={() => updateFilterValue("payments_date",{
                         ...payments_date,
                         order:"newest"
                     })}
@@ -182,8 +213,8 @@ const FilterPane = ({setOpen,toggleStatus}:any)=>{
                   <input
                     type="radio"
                     name="order"
-                     checked={payments_date.order === "newest"}
-                    onChange={() => updateFilterValue("loans",{
+                     checked={payments_date.order === "oldest"}
+                    onChange={() => updateFilterValue("payments_date",{
                         ...payments_date,
                         order:"oldest"
                     })}

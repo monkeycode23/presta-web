@@ -5,7 +5,7 @@ import React from 'react';
 import { useAppSettingsStore } from '../../../store/app.settings.store';
 //import DropdownMessage from './DropdownMessage.js';
 import DropdownNotification from './DropdownNotification.js';
-//import DropdownUser from './DropdownUser.js';
+import DropdownUser from './DropdownUser.js';
 import DarkModeSwitcher from './DarkModeSwitcher.js';
 
 //import DropDownConnectedClients from './DropDownConnectedClients.js';
@@ -84,10 +84,10 @@ const Header = () => {
       </h2>
         </div>
 
-        <div className="flex items-center gap-3 2xsm:gap-7">
+        <div className="flex items-center gap-10 2xsm:gap-7">
           
        
-          <ul className="flex items-center gap-2 2xsm:gap-4">
+          <ul className="flex items-center gap-10 2xsm:gap-4">
 
 {/*             <DropDownConnectedClients /> */}
             {/* <!-- Dark Mode Toggler --> */}
@@ -104,7 +104,7 @@ const Header = () => {
           </ul>
 
           {/* <!-- User Area --> */}
-          {/* <DropdownUser /> */}
+          <DropdownUser /> 
           {/* <!-- User Area --> */}
         </div>
       </div>

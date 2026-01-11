@@ -91,7 +91,7 @@ export default function Calendar() {
     const datePayments = getPaymentsForDate(date);
 
 
-    console.log(datePayments)
+  
 
      if(!datePayments) return null
 

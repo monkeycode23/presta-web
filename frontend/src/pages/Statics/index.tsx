@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Download, Calendar, Users, DollarSign, TrendingUp, Filter, Search, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { Client, Loan, Payment } from '../App';
+import type { Client, Loan, Payment } from '../../types/general'
 
 interface ReportsProps {
   clients: Client[];
@@ -10,13 +10,17 @@ interface ReportsProps {
 
 type ReportType = 'clients' | 'payments' | 'loans' | 'overdue';
 
-export function Reports({ clients, loans, payments }: ReportsProps) {
+export function Reports() {
   const [reportType, setReportType] = useState<ReportType>('clients');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedClient, setSelectedClient] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const clients:any = []
+  const loans:any = []
+  const payments:any = []
+  
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',

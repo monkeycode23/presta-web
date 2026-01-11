@@ -83,7 +83,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 
       <div
         ref={dropdown}
-        className={`absolute bottom-4 z-40  space-y-1 rounded-sm border border-stroke bg-white p-1.5 shadow-default dark:border-strokedark dark:bg-boxdark
+        className={`absolute bottom-4 z-40  space-y-1 rounded-lg border border-stroke bg-white p-1.5 shadow-default dark:border-strokedark dark:bg-boxdark
           ${left ? "left-5" : ""}
           ${right ? "right-5" : ""}
           ${top ? `top-[${top}px]` : ""}

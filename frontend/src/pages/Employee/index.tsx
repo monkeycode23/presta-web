@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Mail, Phone, Briefcase, Calendar, UserCheck, UserX, Eye, Edit2, Activity, Shield, ChevronLeft, CheckCircle, XCircle, Clock, ArrowLeft } from 'lucide-react';
-import { Employee, ActivityLog } from '../App';
+import type{ Employee, ActivityLog } from '../../types/general';
 
 interface EmployeeManagementProps {
   employees: Employee[];
@@ -9,7 +9,7 @@ interface EmployeeManagementProps {
   onUpdateEmployee?: (employeeId: string, updates: Partial<Employee>) => void;
 }
 
-export function EmployeeManagement({ employees, activityLogs = [], onAddEmployee, onUpdateEmployee }: EmployeeManagementProps) {
+export function EmployeeManagement({ employees =[], activityLogs = [],  }: EmployeeManagementProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -17,6 +17,14 @@ export function EmployeeManagement({ employees, activityLogs = [], onAddEmployee
 
   const activeEmployees = employees.filter(e => e.status === 'activo').length;
   const inactiveEmployees = employees.filter(e => e.status === 'inactivo').length;
+
+
+  const onAddEmployee = (formData: FormData) => {
+
+
+  } 
+  
+  const onUpdateEmployee = (formData: FormData) => { }
 
   const handleAddEmployee = (formData: FormData) => {
     const newEmployee = {

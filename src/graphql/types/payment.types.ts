@@ -85,6 +85,7 @@ input PaymentsFilter2 {
   status: [String]
   order:String
   clientId:String
+  client:String
   payment_date:PaymentDate
   
 }
