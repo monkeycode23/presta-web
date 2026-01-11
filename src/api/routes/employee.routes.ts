@@ -20,7 +20,7 @@ router.put('/:clienteId',
 
 
 router.post('/',
-    [authRequired,requirePermissionRole("create_client")],
+    [authRequired,requirePermissionRole("client:create")],
     createClientValidationRules,validateRequest , 
     clientController.createAction()
 );

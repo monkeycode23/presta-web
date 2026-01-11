@@ -10,8 +10,11 @@ interface PaymentState {
   payments: IPayment[];
   currentPayment: IPayment | null;
   selectedPayments:IPayment[]
+  
+  paymentsStatus:any[]
   loading: boolean;
   error: string | null;
+
 
   setPayments: (payments: IPayment[]) => void;
   setCurrentPayment: (payment: IPayment | null) => void;
@@ -22,7 +25,7 @@ interface PaymentState {
 
   setLoading: (value: boolean) => void;
   setError: (error: string | null) => void;
-
+ setPaymentsStatus: (status:any[]) =>void
   reset: () => void;
 }
 
@@ -33,6 +36,7 @@ export const usePaymentStore = create<PaymentState>((set) => ({
   currentPayment: null,
   loading: false,
   error: null,
+  paymentsStatus:[],
 
   selectedPayments:[],
   setPayments: (payments) =>
@@ -45,6 +49,15 @@ export const usePaymentStore = create<PaymentState>((set) => ({
     set((state) => ({
       payments: [...state.payments, payment],
     })),
+
+
+    setPaymentsStatus: (status) =>
+    set((state) =>{
+
+        return  ({
+      paymentsStatus: status,
+    })
+    }),
 
   updatePayment: (id, data) =>
     set((state) => ({

@@ -3,9 +3,10 @@ import { useLoanStore } from "../../store/loan.store";
 import type { ILoan } from "../../types/general";
 import { usePaymentStore } from "../../store/payment.store";
 import LoanCard from "../../components/loans/LoanCard";
-import { Filter, TrendingUp } from "lucide-react";
+import { CreditCard, Filter, TrendingUp } from "lucide-react";
 import { AddLoanModal } from "./AddLoanModal";
 import Tag from "../../components/Tag";
+import { usePaginationFilterStore } from "../../store/pagination.filter";
 
 const FILTERS = [
   {
@@ -36,10 +37,10 @@ const FILTERS = [
 ];
 
 const STATUS_OPTIONS = [
-  { label: "En curso", value: "active" },
-  { label: "Completados", value: "completed" },
   { label: "Pendientes", value: "pending" },
-  { label: "Cancelados", value: "cancelled" },
+  { label: "Pagados", value: "paid" },
+  { label: "Incompletos", value: "incomplete" },
+  { label: "Expirados", value: "expired" },
 ];
 
 
@@ -48,111 +49,110 @@ function PaymentFilterDropdown() {
   const [status, setStatus] = useState([]);
   const [order, setOrder] = useState("newest");
 
-  const [disbursementDate, setDisbursementDate] = useState({
-    from: "",
-    to: "",
-  });
+  const {filters,updateFilterValue} = usePaginationFilterStore()
 
-  const [amount, setAmount] = useState({ from: "", to: "" });
+  
 
-  const [installments, setInstallments] = useState({
-    from: "",
-    to: "",
-  });
-  const [filtrosActivos, setFiltrosActivos] = useState<any>({
-    orden: "newest",
-  });
-  const [filtrosVisibles, setFiltrosVisibles] = useState<boolean>(false);
+  
 
-  const toggleStatus = (value:any) => {
-    setStatus((prev:any) =>
-      prev.includes(value) ? prev.filter((s) => s !== value) : [...prev, value]
-    );
-  };
+  const quitarFiltro = (clave: any, value :any) => {
+    
+    if(clave == "estado"){
 
-  const clearFilters = () => {
-    setStatus([]);
-    setOrder("newest");
-    setDisbursementDate({ from: "", to: "" });
-    setAmount({ from: "", to: "" });
-    setInstallments({ from: "", to: "" });
-  };
+        const newState = filters.payments.status.filter((s:any) => s !== value)
 
-  const quitarFiltro = (clave: any, valor = null) => {
-    const nuevos: any = { ...filtrosActivos };
-
-    if (clave === "estadoCuota" && valor) {
-      const nuevaLista = nuevos.estadoCuota.filter((e: any) => e !== valor);
-      if (nuevaLista.length > 0) {
-        nuevos.estadoCuota = nuevaLista;
-      } else {
-        delete nuevos.estadoCuota;
-      }
-      //setEstadoCuotasSeleccionadas(nuevaLista);
-    } else {
-      delete nuevos[clave];
-      /*  if (clave === 'nombre') {
-        setNombre('');
-      } else if (clave === 'cantidadPrestamos') {
-        setCantidadPrestamos(0);
-      } else if (clave === 'estadoCuota') {
-        setEstadoCuotasSeleccionadas([]);
-      } */
+        console.log(newState)
+        updateFilterValue("payments",{
+            status: newState
+        })
+        
     }
-
-    setFiltrosActivos(nuevos);
   };
 
+    const toggleStatus = (value:any) => {
+
+        const status = filters.payments.status;
+
+        updateFilterValue("payments",{
+            status: status.includes(value) ? status.filter((s:any) => s !== value) : [...status, value]
+        })
+
+        console.log(filters.payments)
+    }
   return (
     <div className="relative inline-block">
-      <div className="flex gap-2 ">
+      <div className="flex gap-4 ">
 
-   <button
+           <button
           onClick={() => setOpen(!open)}
-          className="flex gap-1 justify-center items-center border border-gray-300 px-1 rounded-md"
+          className="flex gap-1 justify-center items-center  px-1 rounded-md"
         >
             <Filter className="" size={15}></Filter>
           Filtros
         </button>
-
         <div className=" flex flex-wrap gap-2">
-          {filtrosActivos.orden && (
-            <Tag color="blue" onClose={() => quitarFiltro("orden")}>
-              orden: {filtrosActivos.orden}
+          {filters.payments.order && (
+            <Tag color="blue" >
+              orden: {filters.payments.order}
             </Tag>
           )}
-          {filtrosActivos.status &&
-            filtrosActivos.status.map((estado: any) => (
+          {filters.payments.status &&
+            filters.payments.status.map((estado: any) => (
               <Tag
                 key={estado}
                 color="orange"
                 onClose={() => quitarFiltro("estado", estado)}
               >
-                prestamo: {estado}
+               <span className="flex gap-2 justify-center items-center px-1 text-xs">
+                 <CreditCard width={15}></CreditCard> {estado}</span>
               </Tag>
             ))}
 
-          {/*  {filtrosActivos. &&
-          filtrosActivos.estadoCuota.map((estado:any) => (
-            <Tag key={estado} color="green" onClose={() => quitarFiltro('estadoCuota', estado)}>
-              Cuota: {estado}
-            </Tag>
-          ))}
-
-        {filtrosActivos.cantidadPrestamos && (
+   {/*      {filters.payments.disbursementDate.from ?
+          
+            <Tag  color="green" onClose={() =>{}}>
+              F.Desmb: {filters.payments.disbursementDate.from} / {filters.loans.disbursementDate.to}
+            </Tag> :<></>
+          }
+ */}
+         {/*          {filters.payments.amount.from ? (
           <Tag color="purple" onClose={() => quitarFiltro('cantidadPrestamos')}>
-            Préstamos: {filtrosActivos.cantidadPrestamos != "sin prestamos activos" ?filtrosActivos.cantidadPrestamos+" o mas" : filtrosActivos.cantidadPrestamos}
-          </Tag>
-        )} */}
+            monto: ${filters.payments.amount.from}/ ${filters.payments.amount.to}
+          </Tag>):<></>
+        } 
+
+              {filters.payments.installments.from ? (
+          <Tag color="gray" onClose={() => quitarFiltro('cantidadPrestamos')}>
+            cuotas: {filters.payments.installments.from}/ {filters.payments.installments.to}
+          </Tag>) :<></>
+        } */}
         </div>
 
-       
+     
       </div>
       {/* Botón */}
 
       {/* Popup */}
       {open && (
-        <div
+        <FilterPane setOpen={setOpen} toggleStatus={toggleStatus}></FilterPane>
+      )}
+    </div>
+  );
+}
+
+
+
+
+const FilterPane = ({setOpen,toggleStatus}:any)=>{
+
+
+    const {updateFilterValue,filters,resetFilters } = usePaginationFilterStore()
+
+
+  
+  
+
+    return ( <div
           className="
             absolute left-0 mt-2
             w-[90vw] max-w-3xl
@@ -166,14 +166,14 @@ function PaymentFilterDropdown() {
             <div>
               <h4 className="text-sm font-semibold mb-2">Estado</h4>
               <div className="space-y-2">
-                {STATUS_OPTIONS.map((option:any) => (
+                {STATUS_OPTIONS.map((option) => (
                   <label
                     key={option.value}
                     className="flex items-center gap-2 text-sm"
                   >
                     <input
                       type="checkbox"
-                      checked={status.includes(option.value)}
+                      checked={filters.payments.status.includes(option.value)}
                       onChange={() => toggleStatus(option.value)}
                       className="accent-blue-500"
                     />
@@ -191,8 +191,11 @@ function PaymentFilterDropdown() {
                   <input
                     type="radio"
                     name="order"
-                    checked={order === "newest"}
-                    onChange={() => setOrder("newest")}
+                    checked={filters.payments.order === "newest"}
+                    onChange={() => updateFilterValue("loans",{
+                        ...filters.payments,
+                        order:"newest"
+                    })}
                     className="accent-blue-500"
                   />
                   Más recientes
@@ -201,8 +204,11 @@ function PaymentFilterDropdown() {
                   <input
                     type="radio"
                     name="order"
-                    checked={order === "oldest"}
-                    onChange={() => setOrder("oldest")}
+                     checked={filters.payments.order === "newest"}
+                    onChange={() => updateFilterValue("loans",{
+                        ...filters.payments,
+                        order:"oldest"
+                    })}
                     className="accent-blue-500"
                   />
                   Más antiguos
@@ -210,98 +216,16 @@ function PaymentFilterDropdown() {
               </div>
             </div>
 
-            {/* FECHA DE DESEMBOLSO */}
-            <div>
-              <h4 className="text-sm font-semibold mb-2">
-                Fecha de desembolso
-              </h4>
-              <div className="flex gap-2">
-                <input
-                  type="date"
-                  value={disbursementDate.from}
-                  onChange={(e) =>
-                    setDisbursementDate((p) => ({
-                      ...p,
-                      from: e.target.value,
-                    }))
-                  }
-                  className="input"
-                />
-                <input
-                  type="date"
-                  value={disbursementDate.to}
-                  onChange={(e) =>
-                    setDisbursementDate((p) => ({
-                      ...p,
-                      to: e.target.value,
-                    }))
-                  }
-                  className="input"
-                />
-              </div>
-            </div>
-
-            {/* MONTO */}
-            <div>
-              <h4 className="text-sm font-semibold mb-2">Monto</h4>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  placeholder="Min"
-                  value={amount.from}
-                  onChange={(e) =>
-                    setAmount((p) => ({ ...p, from: e.target.value }))
-                  }
-                  className="input"
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={amount.to}
-                  onChange={(e) =>
-                    setAmount((p) => ({ ...p, to: e.target.value }))
-                  }
-                  className="input"
-                />
-              </div>
-            </div>
+       
 
             {/* CUOTAS */}
-            <div>
-              <h4 className="text-sm font-semibold mb-2">Cantidad de cuotas</h4>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  placeholder="Min"
-                  value={installments.from}
-                  onChange={(e) =>
-                    setInstallments((p) => ({
-                      ...p,
-                      from: e.target.value,
-                    }))
-                  }
-                  className="input"
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={installments.to}
-                  onChange={(e) =>
-                    setInstallments((p) => ({
-                      ...p,
-                      to: e.target.value,
-                    }))
-                  }
-                  className="input"
-                />
-              </div>
-            </div>
+           
           </div>
 
           {/* FOOTER */}
           <div className="flex justify-between items-center px-4 py-3 border-t">
             <button
-              onClick={clearFilters}
+              onClick={()=>resetFilters("payments")}
               className="text-sm text-gray-500 hover:text-gray-700"
             >
               Limpiar
@@ -317,13 +241,10 @@ function PaymentFilterDropdown() {
               Aplicar
             </button>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        </div>)
 }
 
-export default PaymentFilterDropdown;
+export default PaymentFilterDropdown
 
 /* function LoanFilterDropdown({ status, setStatus, order, setOrder }) {
   const [open, setOpen] = useState(false);

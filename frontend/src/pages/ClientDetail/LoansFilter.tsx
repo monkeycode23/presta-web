@@ -147,7 +147,7 @@ const FilterPane = ({setOpen,toggleStatus}:any)=>{
             w-[90vw] max-w-3xl
             bg-white rounded-xl shadow-xl
             border border-gray-200
-            z-50
+            z-52
           "
         >
           <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -185,6 +185,7 @@ const FilterPane = ({setOpen,toggleStatus}:any)=>{
                         ...filters.loans,
                         order:"newest"
                     })}
+
                     className="accent-blue-500"
                   />
                   Más recientes
@@ -193,10 +194,11 @@ const FilterPane = ({setOpen,toggleStatus}:any)=>{
                   <input
                     type="radio"
                     name="order"
-                     checked={filters.loans.order === "newest"}
+                     checked={filters.loans.order === "oldest"}
                     onChange={() => updateFilterValue("loans",{
-                        ...filters.loans,
-                        order:"oldest"
+                      ...filters.loans,
+                      order:"oldest"
+                      
                     })}
                     className="accent-blue-500"
                   />

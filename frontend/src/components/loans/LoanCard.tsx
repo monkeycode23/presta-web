@@ -90,7 +90,7 @@ const LoanCard = ({ loan }: any) => {
 
         {menuOpen && (
           <div className="absolute right-0 mt-2  bg-white text-gray-700 rounded-lg shadow-lg">
-            <OptionsDropDown></OptionsDropDown>
+            <OptionsDropDown loan={loan}></OptionsDropDown>
           </div>
         )}
       </div>
@@ -173,10 +173,10 @@ const LoanCard = ({ loan }: any) => {
 export default LoanCard;
 
 
-const OptionsDropDown = () => {
+const OptionsDropDown = ({loan}:any) => {
 
-
-
+ const { setCurrentLoan, currentLoan } = useLoanStore();
+    const {modals,openModal} = useModalStore()
   return (
     
       <ul className="">
@@ -188,10 +188,20 @@ const OptionsDropDown = () => {
               hover:bg-gray-100
               transition
             "
+            onClick={(event)=>{
+                event.stopPropagation()
+
+                openModal("EDIT_LOAN")
+
+                setCurrentLoan(loan)
+                console.log(modals)
+                ///open modal
+            }}
           >
             <Pencil size={16} className="text-gray-500" />
             Editar
-          </button>
+          </button> 
+         
         </li>
         <DeleteLoanModal></DeleteLoanModal>
         <li>
@@ -205,6 +215,8 @@ const OptionsDropDown = () => {
 
 import { createPortal } from "react-dom";
 import { usePaginationFilterStore } from "../../store/pagination.filter";
+import { EditLoanModal } from "../../pages/ClientDetail/EditLoanModal";
+import { useModalStore } from "../../store/modal.store";
 
 function DropdownPortal({children}:any) {
   const portalRoot = document.getElementById("root");

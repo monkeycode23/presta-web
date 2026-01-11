@@ -3,7 +3,6 @@ export class AppError extends Error {
   public isOperational: boolean;
   public data: any;
 
-
   constructor(message: string, statusCode = 500, isOperational = true,data:any) {
     super(message);
     this.statusCode = statusCode;
@@ -19,6 +18,9 @@ export class DatabaseError extends AppError {
      super(message, 500, true, data);
   }
 }
+
+
+
 
 export class AuthError extends AppError {
   constructor(message = "Authentication",data?:any) {

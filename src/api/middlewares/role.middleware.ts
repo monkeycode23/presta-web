@@ -26,7 +26,7 @@ export function requirePermissionRole(action: Action) {
     } catch (error: any) {
       ApiResponse.error(res, {
         authroization: error.message,
-      });
+      },"Permisos insufucientes para ejecutar esta accion");
     }
   };
 }

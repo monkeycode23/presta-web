@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { IClient } from "../../types/general";
-
+ 
 const clienteSchema = new mongoose.Schema<IClient>(
   {
     nickname: {
       type: String,
       required: true,
       trim: true,
+      unique:true
     },
     name: {
       type: String,
@@ -32,7 +33,7 @@ const clienteSchema = new mongoose.Schema<IClient>(
     },
     status: {
       type: String,
-      enum: ["activo", "inactivo", "pendiente", "bloqueado"], // Added enum for valid statuses
+      enum: ["activo", "inactivo", "pendiente", "bloqueado","active","inactive","blocked","banned"], // Added enum for valid statuses
       default: "activo",
     },
     gender: {
@@ -56,10 +57,10 @@ const clienteSchema = new mongoose.Schema<IClient>(
       type: String,
       trim: true,
     },
-    codigoAcceso: {
+    accessCode: {
       type: String,
       trim: true,
-      unique: true,
+      
     },
     password: {
       type: String,
@@ -91,27 +92,34 @@ const clienteSchema = new mongoose.Schema<IClient>(
     isConnected: Boolean,
 
     statics: {
+        loans: {
+        total: { type: Number, default: 0 ,min: 0,},
+        active: { type: Number, default: 0,min: 0, },
+        completed: { type: Number, default: 0,min: 0, },
+        canceled: { type: Number, default: 0,min: 0, },
+        
+      },
       payments: {
-        total: { type: Number, default: 0 },
-        pending: { type: Number, default: 0 },
-        paid: { type: Number, default: 0 },
-        expired: { type: Number, default: 0 },
-        incomplete: { type: Number, default: 0 },
+        total: { type: Number, default: 0 ,min: 0,},
+        pending: { type: Number, default: 0,min: 0, },
+        paid: { type: Number, default: 0,min: 0, },
+        expired: { type: Number, default: 0,min: 0, },
+        incomplete: { type: Number, default: 0,min: 0, },
       },
       amounts: {
-        total_lent: { type: Number, default: 0 },
-        total_paid: { type: Number, default: 0 },
-        total_expected: { type: Number, default: 0 },
-        client_debt: { type: Number, default: 0 },
-        overdue_debt: { type: Number, default: 0 },
-        net_gain: { type: Number, default: 0 },
-        gross_gain: { type: Number, default: 0 },
+        total_lent: { type: Number, default: 0,min: 0, },
+        total_paid: { type: Number, default: 0 ,min: 0,},
+        total_expected: { type: Number, default: 0 ,min: 0,},
+        client_debt: { type: Number, default: 0 ,min: 0,},
+        overdue_debt: { type: Number, default: 0 ,min: 0,},
+        net_gain: { type: Number, default: 0 ,min: 0,},
+        gross_gain: { type: Number, default: 0,min: 0, },
       },
       reputation: {
-        score: { type: Number, default: 100 },
-        late_payments: { type: Number, default: 0 },
-        on_time_payments: { type: Number, default: 0 },
-        cancelled_loans: { type: Number, default: 0 },
+        score: { type: Number, default: 100 ,min: 0,},
+        late_payments: { type: Number, default: 0 ,min: 0,},
+        on_time_payments: { type: Number, default: 0,min: 0, },
+        cancelled_loans: { type: Number, default: 0 ,min: 0,},
       },
       activity: {
         last_payment_at: Date,

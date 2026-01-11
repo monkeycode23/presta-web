@@ -12,26 +12,28 @@ scalar Date
 scalar ObjectId
 
 type Amounts {
-  total_left: Float!
-  total_lend: Float!
+  client_debt: Float!
+  total_lent: Float!
   total_paid: Float!
   net_gain: Float!
   brute_gain: Float!
+  
 }
 
 type LoanStats {
-  total_loans: Int!
-  total_active_loans: Int!
-  total_completed_loans: Int!
-  total_cancelled_loans: Int!
+  total: Int!
+  active: Int!
+  completed: Int!
+canceled: Int!
 }
 
 type PaymentStats {
-  total_payments: Int!
-  total_pending_payments: Int!
-  total_expired_payments: Int!
-  total_paid_payments: Int!
-  total_incomplete_payments: Int!
+    total:Int!
+  payments: Int!
+  pending: Int!
+  expired: Int!
+  paid: Int!
+  incomplete: Int!
 }
 
 type ClientStatics {
@@ -50,34 +52,24 @@ type Client {
   email: String
   phone: String
   address: String
-
   status: String! # "activo" | "inactivo" | "pendiente" | "bloqueado"
-
   gender: String
   birthdate: String
   document_id: Int
-
   cbu: String
   aliasCbu: String
-
   codigoAcceso: String!
   password: String
-
   email_verified: Boolean!
   phone_verified: Boolean!
   document_verified: Boolean!
-
   notes: String
   isConnected: Boolean
-
   loans: [ObjectId!]!
   user: ObjectId
-
+  client_since:Date
   created_at: Date!
   updated_at: Date!
-
-  client_since: Date!
-
   statics: ClientStatics!
 }
 
@@ -98,8 +90,8 @@ type Client {
 
 export const clientQueries = gql`
   extend type Query {
-    getClienteById(clientId: ID!): Client
-    getFilterClients(userId:ID0!,filter:ClientsFilter,pagination:PaginationFilter): PaginationFilterClients
+    getClient(clientId: ID!): Client
+    getFilterClients(userId:ID!,filter:ClientsFilter,pagination:PaginationFilter): PaginationFilterClients
    
   }
 `;

@@ -1,41 +1,83 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import Client from "../models/client.model";
 import Loan from "../models/loan.model";
-import  User  from "../models/User.model";
+import User from "../models/User.model";
 import ClientService from "../services/client.sevice";
 import Payment from "../models/payment.model";
-
+import Role from "../models/role.model";
+import { ValidationError } from "../errors/error.handler";
+import { ApiResponse } from "../utils/api.response";
+import lenderModel from "../models/lender.model";
 
 class ClientController {
   constructor() {}
 
   createAction() {
-    return async (req: Request, res: Response) => {
+    
+    return async (req: Request, res: Response, next: NextFunction) => {
       try {
         const clienteData = req.body;
 
-        
+        if (!req.userId) throw new Error("Yout need to be authenticated");
+
+        const user = await User.findById(req.userId);
+
+        if (!user) throw new ValidationError("User not found");
+
+        const lender = await lenderModel.findOne({ user: req.userId });
+
+        if (!lender) throw new ValidationError("Lender not registered");
+
+        clienteData.user = req.userId;
+
         console.log(clienteData, "client data");
+
+        const nickname = clienteData.name;
+        clienteData.nickname = nickname;
+        clienteData.name = nickname.split(" ")[0];
+        clienteData.lastname = nickname.split(" ")[1];
+        clienteData.client_since = new Date();
         //console.log(clienteData,"clienteData")
         const query = await Client.findOne({
           nickname: clienteData.nickname ? clienteData.nickname : "",
         });
-        
+
         //console.log(query,"query")
         if (query) {
-          throw new Error("Client already exists");
+          throw new ValidationError("Client already exists", {
+            name: "Este cliente ya existe",
+          });
         }
 
         // Generar código de acceso único de 5 dígitos si no se proporciona
-        clienteData.accessCode = ClientService.generateAccessCode();
+
+        const accessCode = ClientService.generateAccessCode();
+
+        if (accessCode) {
+          clienteData.accessCode = accessCode;
+        }
+
+        clienteData.status = "inactive";
 
         const cliente = new Client(clienteData);
+
+        const clientRole = await Role.findOne({ name: "client" });
+
+        if (clientRole) {
+          cliente.roles.push(clientRole._id);
+        }
+
         const savedCliente = await cliente.save();
 
-        res.status(201).json(savedCliente);
+        lender.clients.push(savedCliente._id);
+
+        await lender.save();
+
+        ApiResponse.success(res, savedCliente, "Client registered sucessfully");
       } catch (error) {
         console.error("Error al crear cliente:", error);
         // res.status(500).j77son({ mensaje: "Error del servidor" });
+        next(error);
       }
     };
   }
@@ -76,7 +118,6 @@ class ClientController {
         if (!client)
           return res.status(404).json({ mensaje: "Cliente no encontrado" });
 
-        
         const prestamos = client.loans;
 
         for (const prestamo of prestamos) {
@@ -85,8 +126,6 @@ class ClientController {
           // Eliminar el préstamo
           await Loan.findByIdAndDelete(prestamo);
         }
-
-       
 
         res.json({
           mensaje:
@@ -101,10 +140,6 @@ class ClientController {
 }
 
 export default ClientController;
-
-
-
-
 
 /* // Actualizar perfil del cliente autenticado
 export const updateClienteProfile = async (req, res) => {
@@ -153,17 +188,6 @@ export const updateClienteProfile = async (req, res) => {
     res.status(500).json({ mensaje: 'Error del servidor al actualizar el perfil' });
   }
 }; */
-
-
-
-
-
-
-
-
-
-
-
 
 /* 
 

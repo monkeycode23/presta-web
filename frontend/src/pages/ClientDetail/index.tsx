@@ -22,6 +22,7 @@ import { useLoanStore } from "../../store/loan.store";
 import { GET_CLIENT_PAYMENTS, type GetPaymentsResponse, type GetPaymentsVars } from "../../graphql/payments.queries";
 import { usePaymentStore } from "../../store/payment.store";
 import { usePaginationFilterStore } from "../../store/pagination.filter";
+import { EditLoanModal } from "./EditLoanModal";
 
 /* interface ClientDetailProps {
   client: Client;
@@ -40,8 +41,8 @@ export function ClientDetail() {
   const authStore = useAuthStore();
   const { selectedClient: client,selectClient } = useClientStore();
 
-  const {setLoans,loans } = useLoanStore()
-  const {setFilters, pagination,filters,resetFilters} = usePaginationFilterStore()
+  const {setLoans,loans,setCurrentLoan } = useLoanStore()
+  const {setFilters, pagination,filters,resetFilters,setPage,setTotalPages,setTotal,setPagination} = usePaginationFilterStore()
     const {setPayments} = usePaymentStore()
 
 //client info
@@ -71,10 +72,12 @@ export function ClientDetail() {
 
   useEffect(() => {
     
+    setCurrentLoan(null)
     resetFilters("loans")
+     resetFilters("payments")
     
     setFilters({
-        order:"newst",
+        order:"newest",
         status:[],
         disbursementDate:{
             from:"",
@@ -91,10 +94,14 @@ export function ClientDetail() {
         
     },"loans")
   
-     setFilters({
+    setFilters({
         loanId:"",
+        order:"newest",
         status:[],
+        
+        
     },"payments")
+     
     return () => {
       
     }
@@ -133,9 +140,6 @@ export function ClientDetail() {
    useEffect(() => {
     if (!authStore.user) return;
 
-
-    
-
     const fetch = async () => {
       
       const response: any = await getLoans({
@@ -150,6 +154,7 @@ export function ClientDetail() {
         const loans = _data.getClientLoans;
         console.log(loans,"asdajsbdakjsdbas")
         setLoans(loans.data ?? null);
+
         
       }
     };
@@ -159,7 +164,7 @@ export function ClientDetail() {
     return () => {
       
     };
-  }, [authStore.user, _data ]);
+  }, [authStore.user, _data ,filters.loans,pagination.loans]);
 
 
     useEffect(() => {
@@ -172,8 +177,8 @@ export function ClientDetail() {
           clientId:clientId!,
          filter:filters.payments,
          pagination:{
-            page:1,
-            limit:5
+            page:pagination.payments.page,
+            limit:pagination.payments.pageSize ?? 5
          }
         },
       });
@@ -181,8 +186,18 @@ export function ClientDetail() {
      
       if (data_p) {
         const loans = data_p.getClientPayments;
-        console.log(loans,"asdajsbdakjsdbas")
+       
+
         setPayments(loans.data ?? null);
+        /* 
+        setTotalPages(loans.pagination.totalPages,"payments")
+        setTotal(loans.pagination.total,"payments") */
+
+        setPagination({
+            totalPages:loans.pagination.totalPages,
+            total:loans.pagination.total,
+            pageSize:loans.pagination.limit
+        },"payments")
         
       }
     };
@@ -192,7 +207,7 @@ export function ClientDetail() {
     return () => {
       
     };
-  }, [authStore.user, data_p,filters.payments ]);
+  }, [authStore.user, data_p,filters.payments,pagination.payments.page ]);
 
 
   if (!client) return;
@@ -238,6 +253,8 @@ export function ClientDetail() {
         <ClientLoansList></ClientLoansList>
       {/* Cronograma de Pagos */}
         <ClientLoanPayments></ClientLoanPayments>
+
+        <EditLoanModal ></EditLoanModal>
     </div>
   );
 }

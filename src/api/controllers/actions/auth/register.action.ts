@@ -32,6 +32,8 @@ class RegisterAction {
 
       await this.user.save();
 
+        
+
       ApiResponse.success(
         res,
         {

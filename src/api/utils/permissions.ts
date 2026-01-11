@@ -28,6 +28,7 @@ export const USER_PERMISSIONS = [
   {
     group: "Pagos",
     permissions: [
+        { key: "payment:pay", label: "Registrar pagos" },
       { key: "payment:create", label: "Registrar pagos" },
       { key: "payment:view", label: "Ver pagos" },
       { key: "payment:edit", label: "Editar pagos" },

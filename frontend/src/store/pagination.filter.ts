@@ -29,7 +29,7 @@ export interface PaginationFilterStore {
   setPageSize: (size: number, key: string) => void;
   setTotal: (total: number, key: string) => void;
   setTotalPages: (total: number, key: string) => void;
-  setPagination: ( key: string) => void;
+  setPagination: (data:any, key: string) => void;
   setFilters: (filters: Partial<any>, key: string) => void;
   updateFilterValue: ( key: string, value:any) => void;
   resetFilters: (key: string) => void;
@@ -84,14 +84,34 @@ export const usePaginationFilterStore = create<PaginationFilterStore>()(
           };
         }),
 
-      setTotalPages: (total, key) =>
-        set((state) => ({
+      setTotalPages: (total, key) =>set((state) =>{
+       // console.log(total,"asdansd pagination")
+        const updatedPagination = ({
           pagination: {
             ...state.pagination,
-            [key]: { ...state.pagination[key], totalPages: total },
+            [key]: { ...state.pagination[key],
+                 totalPages: total },
           },
-        })),
+        })
 
+        console.log(updatedPagination)
+        return updatedPagination
+      } ),
+
+      setPagination: (data, key) =>set((state) =>{
+       // console.log(total,"asdansd pagination")
+        const updatedPagination = ({
+          pagination: {
+            ...state.pagination,
+            [key]: {
+                ...state.pagination[key],
+                ...data
+            }, }
+        })
+
+        console.log(updatedPagination)
+        return updatedPagination
+      } ),
       setFilters: (filters, key) =>
         set((state) => ({
           filters: {
@@ -104,14 +124,7 @@ export const usePaginationFilterStore = create<PaginationFilterStore>()(
           },
         })),
 
-          setPagination: ( key) =>
-        set((state) => ({
-          
-          pagination: {
-            ...state.pagination,
-            [key]: { ...state.pagination[key], page: 1 },
-          },
-        })),
+      
 
       resetFilters: (key) =>
         set((state) => ({

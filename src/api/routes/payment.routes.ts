@@ -15,19 +15,21 @@ router.post('/',
      paymentController.createAction()
     );
 
+
+router.post('/pay/:paymentId',
+     [authRequired,requirePermissionRole("payment:pay")], 
+     paymentController.payAction()
+    );
+
 router.put('/:id', 
     [authRequired,requirePermissionRole("edit_payment")], 
     paymentController.createAction());
 
-router.delete('/:pagoId', 
+router.delete('/:paymentId', 
     [authRequired,requirePermissionRole("delete_payment")], 
     paymentController.createAction()
 );
 
-router.post('/pagar/:id', 
-    [authRequired,requirePermissionRole("pay_payment")], 
-    paymentController.createAction()
-);
 
 
 // Nueva ruta para subir comprobante de pago

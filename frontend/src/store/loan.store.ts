@@ -36,7 +36,7 @@ export const useLoanStore = create<LoanState>((set) => ({
 
   addLoan: (loan) =>
     set((state) => ({
-      loans: [...state.loans, loan],
+      loans: [loan,...state.loans ],
     })),
 
   updateLoan: (id, data) =>

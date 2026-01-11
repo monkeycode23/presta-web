@@ -6,7 +6,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import { ClientList } from "./pages/Clients";
-import { PaymentsCalendar } from "./pages/Payments";
+import { PaymentsCalendar } from "./pages/Payments/index";
 import { EmployeeManagement } from "./pages/Employee";
 import { ClientDetail } from "./pages/ClientDetail/index";
 

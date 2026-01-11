@@ -1,9 +1,25 @@
+import { useEffect } from "react"
+import { usePaginationFilterStore } from "../store/pagination.filter"
 
 
   
   
-  function Pagination({currentPage,totalPages,changePage}:any) {
+  function Pagination({name,changePage}:any) {
+
+    const {pagination} = usePaginationFilterStore()
+
+    const {page:currentPage, totalPages,} = pagination[name]
     
+
+    useEffect(() => {
+      
+    
+      return () => {
+        
+      }
+    }, [name])
+    
+   // console.log(currentPage,totalPages,"Asdasdasdasd")
     const elipsePagination=()=>{
 
       const firstPages= (

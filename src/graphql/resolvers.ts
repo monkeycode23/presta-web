@@ -1,4 +1,3 @@
-
 import { AuthService } from "../api/services/auth.service";
 
 // authRequired.ts (middleware de resolver)
@@ -6,7 +5,10 @@ import { GraphQLError } from "graphql";
 
 import { userResolvers } from "./resolvers/user.resolvers";
 
-
+import { clientResolvers } from "./resolvers/client.resolvers";
+import { loanResolvers } from "./resolvers/loan.resolvers";
+import { lenderResolvers } from "./resolvers/lender.resolvers";
+import { paymentsResolvers } from "./resolvers/payment.resolvers";
 
 export const authRequired = (resolverFn: any) => {
   return async (parent: any, args: any, context: any, info: any) => {
@@ -30,7 +32,10 @@ export const authRequired = (resolverFn: any) => {
 
 export const resolvers = {
   Query: {
-   ...userResolvers,
-  
+    ...userResolvers,
+    ...clientResolvers,
+    ...lenderResolvers,
+    ...loanResolvers,
+    ...paymentsResolvers
   },
 };

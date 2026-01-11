@@ -1,3 +1,4 @@
+import { METHODS } from "http";
 
 
 class PaginationService {
@@ -9,11 +10,16 @@ class PaginationService {
     const {limit,page,total} = pagination;
     
       const _limit  = limit ?? 10
-    const skip = page ? (page-1)*_limit: 0
 
+
+    const skip = page ? (page-1)*_limit  : 0
+
+   
+    const totalPages = total>_limit ? Math.ceil(total/limit) : 1
+    console.log(limit,page,total,totalPages,"paginationnnnnnnnnnnnnn")
      return {
             page:page??1,
-            totalPages:total>_limit ?  Math.ceil(_limit/total) : 0,
+            totalPages,
             limit:_limit,
             skip,
             total

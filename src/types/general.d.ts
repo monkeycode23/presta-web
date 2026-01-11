@@ -61,7 +61,7 @@ export interface IClient extends Document {
   cbu?: string;
   aliasCbu?: string;
 
-  codigoAcceso: string;
+  accessCode: string;
   password?: string;
 
   email_verified: boolean;
@@ -123,11 +123,11 @@ export interface IClient extends Document {
 }
 
 export interface ILoanDocument extends Document {
-  _id: string;
+  _id:  Types.ObjectId;
   label?: string;
 
   client: Types.ObjectId;
-
+progress:number;
   amount: number;
   gain?: number;
   interest_amount: number;
@@ -204,6 +204,7 @@ export interface ILoanDocument extends Document {
 import { PaymentStatus, PaymentMethod } from "../api/models/payment.model";
 
 export interface IPaymentDocument extends Document {
+    _id: String
   label?: string;
 
   loan: Types.ObjectId;
@@ -238,7 +239,7 @@ export interface IPaymentDocument extends Document {
   transaction_id?: string;
 
   notes?: string;
-
+client?: Types.ObjectId;
   processed_by?: Types.ObjectId;
   user_id?: Types.ObjectId;
 

@@ -3,95 +3,85 @@ import Loan from "../models/loan.model";
 import Payment from "../models/payment.model";
 import { Request, Response } from "express";
 import { ApiResponse } from "../utils/api.response";
+import mongoose from "mongoose";
+import PaymentService from "../services/payment.service";
 
 class LoanController {
   constructor() {}
 
+  
   createAction() {
+
     return async (req: Request, res: Response, next: any) => {
       try {
-        const { prestamo, payments } = req.body;
-
-        // console.log(req.body)
-        // Validar que el cliente existe
-        const cliente = await Client.findById(prestamo.client);
+        const { clientId, amount, payment_interval,interest_rate,
+            installments, disbursement_date, first_payment_date } = req.body;
+ 
+        const cliente = await Client.findById(clientId);
 
         if (!cliente) throw new Error("Client not found");
 
-        // Calcular montos si no se proporcionan
-        /*   if (!prestamo.total_amount) {
-      prestamo.total_amount = prestamo.amount + prestamo.gain;
-    }
- */
-        /*  const client = await Cliente.findOne({sqlite_id:prestamo.client_id})
-    if(!client){
-      return res.status(404).json({ mensaje: 'Cliente no encontrado' });
-    } */
+            
+        const interest_amount =Math.floor((amount*interest_rate)/100)
+           
+        const total_amount = amount +  interest_amount
+             
+        const loan = {
+            label: "Prestamo " +( Number(cliente.statics.loans.total) + 1),
+            interest_amount,
+            left_amount:total_amount,
+            total_amount,
+              disbursement_date,
+               first_payments_date:first_payment_date 
+          
+        }
 
-        console.log("prestamo", prestamo);
-        console.log(req.userId);
-        /* console.log("prestamo.installments_number",prestamo.installment_number)
-    console.log("prestamo.total_amount",prestamo.total_amount) */
+        
 
         const _prestamo = new Loan({
-          ...prestamo,
-          installment_number: prestamo.installments,
-          total_amount: prestamo.total_amount,
-          payment_interval: prestamo.term,
-          client_id: cliente._id,
-          gain: prestamo.interest_amount,
-          user_id: req.userId,
+            ...loan,
+            amount,
+            interest_rate,
+          installment_number: installments,
+          payment_interval: payment_interval,
+          client: cliente._id,
+          gain: loan.interest_amount,
+          
         });
+
+
         const savedPrestamo = await _prestamo.save();
+          
+        //loans
+        cliente.loans.push(savedPrestamo._id);
+        cliente.statics.loans.total =cliente.statics.loans.total+1
+        cliente.statics.loans.active =cliente.statics.loans.active+1
+        //payments
+        cliente.statics.payments.total =cliente.statics.payments.total+installments
+        cliente.statics.payments.pending =cliente.statics.payments.pending+installments
+        //amounts
+        cliente.statics.amounts.total_lent =cliente.statics.amounts.total_lent+amount 
+        cliente.statics.amounts.client_debt =cliente.statics.amounts.client_debt+loan.total_amount 
 
-        await Client.findByIdAndUpdate(cliente._id, {
-          $push: { loans: savedPrestamo._id },
-        });
 
-        //   console.log(payments)
 
-        const _payments = payments.map((payment: any, index: any) => {
-          const nuevoPago = {
-            ...payment,
-            net_amount: payment.amount,
-            total_amount: payment.total_amount,
-            gain: payment.interest_amount,
-            interest_amount: payment.interest_amount,
-            installment_number: index + 1,
-            user: req.userId,
+        await cliente.save()
 
-            loan: savedPrestamo._id,
-          };
 
-          console.log(nuevoPago, "nuevo pago");
-          return nuevoPago;
-        });
+        console.log(payment_interval)
 
-        const savedPayments = await Payment.insertMany(_payments);
+        let savedPayments 
+        if(payment_interval !== "custom"){
+           
+            savedPayments = await  PaymentService.generatePayments(_prestamo) 
 
-        /*  // Actualizar el cliente con la referencia al préstamo
-   
+        }
+       
 
-    const _payments = payments.map(payment =>{
-
-      const sqlite_id = payment.id
-
-      delete payment.id
-      return {...payment, loan_id:savedPrestamo._id,sqlite_id:sqlite_id}
-    });
-
-    const savedPayments = await Pago.insertMany(_payments);
-   // console.log("savedPayments",savedPayments)
-    await Prestamo.findByIdAndUpdate(
-      savedPrestamo._id,
-      { $push: { payments: savedPayments } }
-    ); */
-
-        res.status(201).json(savedPrestamo);
-        ApiResponse.success(res, {
-          loan: prestamo,
-          payments: savedPayments,
-        });
+        ApiResponse.success(res,{
+            loan:savedPrestamo,
+            payments:savedPayments
+        }, "Prestamo otorgado exitosamente")
       } catch (error) {
         console.error("Error al crear préstamo:", error);
         next(error);
@@ -136,6 +126,8 @@ class LoanController {
   }
 
   deleteAction() {
+
+
     return async (req: Request, res: Response, next: any) => {
       try {
         const { prestamoId } = req.params;
@@ -147,14 +139,35 @@ class LoanController {
           return res.status(404).json({ mensaje: "Préstamo no encontrado" });
         }
 
+        if(prestamo.status != "active") throw new Error("No se peude eliminar prestamos que no sean activos");
+
+        
+        if(prestamo.paid_amount != 0) throw new Error("No se peude eliminar prestamos que tenga pagos pagados");
+        
+       
         // Eliminar pagos asociados al préstamo
         await Payment.deleteMany({ loan_id: prestamo._id });
 
-        // Eliminar el préstamo de la lista de préstamos del cliente
-        await Client.findByIdAndUpdate(prestamo.client, {
-          $pull: { loans: prestamo._id },
-        });
+    const cliente = await Client.findById(
+      prestamo.client,
+      
+    ); // { new: true } asegura que el documento actualizado se devuelva
 
+    if (!cliente) throw new Error("Cliente no encontrado");
+
+    //cliente.loans = cliente.loans.filter((l)=>l==prestamo._id)
+    // Actualizamos los valores dentro del objeto 'static'
+    cliente.statics.loans.total -= 1; // Decrementamos el total de préstamos
+    cliente.statics.loans.active -= 1; // Decrementamos los préstamos activos
+
+    console.log(prestamo,"pprestamo")
+    cliente.statics.payments.total -= prestamo.installment_number; // Sumamos el número de cuotas pagadas
+    cliente.statics.payments.pending -= prestamo.installment_number; // Sumamos cuotas pendientes
+
+    cliente.statics.amounts.total_lent -= prestamo.amount; // Incrementamos el total prestado
+    cliente.statics.amounts.client_debt -= prestamo.total_amount; // Incrementamos la deuda total del cliente
+
+    await cliente.save();
         // Eliminar el préstamo
         await Loan.findByIdAndDelete(prestamo._id);
 

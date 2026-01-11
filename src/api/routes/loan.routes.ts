@@ -22,11 +22,11 @@ router.get('/pendientes', verificarToken, getPendingLoans);
 
 
 
-router.post('/',  [authRequired,requirePermissionRole("create_loan")],loanController.createAction());
+router.post('/',  [authRequired,requirePermissionRole("loan:create")],loanController.createAction());
 
 router.put('/:prestamoId',  [authRequired,requirePermissionRole("edit_loan")],loanController.updateAction());
 
-router.delete('/:prestamoId',  [authRequired,requirePermissionRole("delete_loan")],loanController.deleteAction());
+router.delete('/:prestamoId',  [authRequired,requirePermissionRole("loan:delete")],loanController.deleteAction());
 
 
 //router.post('/request', verificarToken, createLoanRequest);

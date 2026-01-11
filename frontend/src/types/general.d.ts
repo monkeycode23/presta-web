@@ -9,7 +9,6 @@ export interface User {
   roles: string[];
 }
 
-
 // types/payment.ts
 export enum PaymentMethod {
   CASH = "cash",
@@ -42,7 +41,7 @@ export interface IPayment {
   label?: string;
 
   loan: ILoan;
-    client:IClient
+  client: IClient;
   interest_amount: number;
   gain: number;
   total_amount: number;
@@ -80,36 +79,35 @@ export interface IPayment {
   updated_at: string;
 }
 
-
 // types/loan.ts
 export type LoanStatus =
-  | 'Pendiente'
-  | 'pending'
-  | 'active'
-  | 'completed'
-  | 'cancelled'
-  | 'refounded'
-  | 'Aprobado'
-  | 'Rechazado'
-  | 'En curso'
-  | 'Pagado'
-  | 'Vencido'
-  | 'Cancelado';
+  | "Pendiente"
+  | "pending"
+  | "active"
+  | "completed"
+  | "cancelled"
+  | "refounded"
+  | "Aprobado"
+  | "Rechazado"
+  | "En curso"
+  | "Pagado"
+  | "Vencido"
+  | "Cancelado";
 
 export type PaymentInterval =
-  | 'daily'
-  | 'weekly'
-  | 'monthly'
-  | 'fortnightly'
-  | 'fortnigt'
-  | 'yearly'
-  | 'custom'
-  | 'unique'
-  | 'Diario'
-  | 'Semanal'
-  | 'Quincenal'
-  | 'Mensual'
-  | 'Personalizado';
+  | "daily"
+  | "weekly"
+  | "monthly"
+  | "fortnightly"
+  | "fortnigt"
+  | "yearly"
+  | "custom"
+  | "unique"
+  | "Diario"
+  | "Semanal"
+  | "Quincenal"
+  | "Mensual"
+  | "Personalizado";
 
 export interface ILoan {
   _id: string;
@@ -194,8 +192,8 @@ export interface IClient {
   created_at: Date;
   updated_at: Date;
 
-  client_since: Date
-  
+  client_since: Date;
+
   statics: {
     loans: {
       total: number;

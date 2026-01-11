@@ -3,55 +3,18 @@ import { Request, Response } from "express";
 import Loan from "../models/loan.model";
 import Payment from "../models/payment.model";
 import { ApiResponse } from "../utils/api.response";
-
+import PayAction from "./actions/payments/pay.action";
 import { PaymentStatus } from "../models/payment.model";
- 
+import Client from "../models/client.model";
+
 class PaymentController {
   constructor() {}
 
-  PayAction() {
-    return async (req: Request, res: Response, next: any) => {
-      try {
-        const { paymentId } = req.params;
-        const { paid_amount, payment_method } = req.body;
+  payAction() {
+    const payment = new PayAction();
+        return  payment.request.bind(payment); 
+         
 
-        const pago = await Payment.findById(paymentId);
-
-        if (!pago) throw new Error("Payment not found");
-
-        const left_amount = pago.total_amount - paid_amount;
-
-        pago.status =
-          left_amount == 0 ? PaymentStatus.PAID : PaymentStatus.INCOMPLETE;
-        pago.paid_amount = paid_amount;
-        pago.left_amount = left_amount as number;
-        pago.payment_method = payment_method;
-
-        console.log(pago);
-
-        const prestamo = await Loan.findById(pago.loan);
-
-        if (!prestamo) throw new Error("Loan not found");
-
-        const left = Number(prestamo.left_amount) - paid_amount;
-
-        prestamo.left_amount = left < 0 ? 0 : left;
-        prestamo.paid_amount =
-          prestamo.paid_amount + paid_amount <= prestamo.total_amount
-            ? prestamo.paid_amount + paid_amount
-            : prestamo.paid_amount;
-
-        if (prestamo.left_amount <= 0) prestamo.status = "completed";
-
-        await prestamo.save();
-        await pago.save();
-
-        ApiResponse.success(res, {});
-      } catch (error) {
-        console.error("Error al obtener pago:", error);
-        next(error);
-      }
-    };
   }
 
   deleteAction() {
@@ -196,7 +159,6 @@ class PaymentController {
     // Actualizar pago
   }
 }
-
 
 export default PaymentController;
 // Crear nuevo pago

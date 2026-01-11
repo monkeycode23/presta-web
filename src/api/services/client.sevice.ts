@@ -9,6 +9,7 @@ class ClientService {
   async get(filter: any) {
     const { filters, pagination, userId } = filter;
 
+
     const total = await Client.countDocuments();
 
     const _pagination = PaginationService.getPagination({
@@ -17,7 +18,7 @@ class ClientService {
       total,
     });
 
-    const { skip, limit: _limit } = pagination;
+    const { skip, limit } = _pagination;
     //const userService = new UserService()
 
     const classrooms = await Client.aggregate([
@@ -27,7 +28,7 @@ class ClientService {
         },
       },
       { $skip: skip },
-      { $limit: _limit },
+      { $limit: limit },
 
       
       
@@ -37,11 +38,23 @@ class ClientService {
      
     ]);
 
+    
     return {
-      pagination,
+      pagination:_pagination,
       data: classrooms,
     };
   }
+
+ async getClient(clientId: string) {
+
+    const client = await Client.findById(clientId);
+
+    if(!client) throw new Error("Client Not found");
+
+    return  client
+  }
+
+
 
   static generateAccessCode() {
     const codigoAcceso = Math.floor(10000 + Math.random() * 90000).toString();

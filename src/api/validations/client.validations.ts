@@ -35,17 +35,19 @@ export const createClientValidationRules = [
     .withMessage("La direccion debe tener al menos 50 caracteres"),
 
   body("email")
-  .optional()
+    .optional({ checkFalsy: true })
   .isEmail()
   .withMessage("Email inválido")
   .isLength({ max: 50 })
     .withMessage("El apellido debe tener al menos 50 caracteres")
+   
   ,
 
   body("phone")
-  .optional()
+    .optional({ checkFalsy: true })
   .matches(/^(\d{1,4})-(\d{6,8})$/)
   .withMessage("El teléfono debe tener 1-4 dígitos de característica y 6-8 dígitos de número principal")
+
   ,
 
   body("cbu")

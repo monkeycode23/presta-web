@@ -49,14 +49,17 @@ export function useForm<T>({
       loading: false,
     }
   );
-
- useEffect(() => {
+useEffect(() => {
+  // inicializa o sincroniza el form
   setForm(name, {
     inputs: initialValues,
     errors: {},
     loading: false,
   });
+}, [name]);
 
+// 👇 cleanup SOLO al desmontar
+useEffect(() => {
   return () => {
     resetForm(name);
   };

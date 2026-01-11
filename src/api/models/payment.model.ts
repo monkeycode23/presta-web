@@ -128,6 +128,10 @@ const pagoSchema = new mongoose.Schema<IPaymentDocument>(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    client: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Client",
+    },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

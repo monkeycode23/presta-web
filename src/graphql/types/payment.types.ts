@@ -1,6 +1,6 @@
 import { gql } from "graphql-tag";
 
-export const PaymenttypeDefs = gql`
+export const PaymentTypeDefs = gql`
   enum PaymentStatus {
     PENDING
     PAID
@@ -22,46 +22,45 @@ export const PaymenttypeDefs = gql`
 
 
   type Payment {
-    id: ID!
+    _id: ID!
     
     label: String
 
     loan: Loan!
+    client:Client!
 
-    interestAmount: Float!
+    interest_amount: Float!
     gain: Float
-    totalAmount: Float
+    total_amount: Float
 
-    paymentDate: DateTime!
+    payment_date: DateTime!
 
-    netAmount: Float!
+    net_amount: Float!
     amount: Float!
 
-    status: PaymentStatus!
+    status: String
 
-    leftAmount: Float
-    paidAmount: Float
-    paidDate: DateTime
+    left_amount: Float
+    paid_amount: Float
+    paid_date: DateTime
 
-    incompleteAmount: Float
+    incomplete_amount: Float
 
-    paymentMethod: PaymentMethod!
+    payment_method: String
 
-    installmentNumber: Int!
+    installment_number: Int!
     dueDate: DateTime
 
     lateFee: Float!
-    lateDays: Int!
+    late_days: Int!
 
     receiptNumber: String
     transactionId: String
 
     notes: String
 
-    processedBy: User
+    processed_by: User
     user: User
-
-    
 
     createdAt: DateTime!
     updatedAt: DateTime!
@@ -69,16 +68,54 @@ export const PaymenttypeDefs = gql`
 
  
 
+ input PaymentsFilter {
+  loanId: String
+  status: [String]
+  order:String
+  
+}
 
-
+input PaymentDate {
+    from:String
+    to:String
+    exact:String
+}
+input PaymentsFilter2 {
+  loanId: String
+  status: [String]
+  order:String
+  clientId:String
+  payment_date:PaymentDate
+  
+}
   type PaginationFilterPayments {
     pagination: Pagination
     data: [Payment]
   }
+  type PaymentsCalendarDay {
+  _id:String
+  total:Int
+  pending:Int 
+  expired:Int
+  paid:Int
+  incomplete:Int
+  paidAmount:Int
+  totalAmount:Int
+}
+
+
+input PaymentsStatusFilter {
+  payment_date:PaymentDate
+  
+}
 `;
 
-export const clientQueries = gql`
+
+export const paymentQueries = gql`
   extend type Query {
-    getClientPayments(clientId: ID!): PaginationFilterPayments
+    getPayments(filter:PaymentsFilter2,pagination:PaginationFilter): PaginationFilterPayments
+    getClientPayments(clientId: ID!,filter:PaymentsFilter,pagination:PaginationFilter): PaginationFilterPayments
+
+    paymentsStatus(filter:PaymentsStatusFilter):[PaymentsCalendarDay]
   }
 `;
