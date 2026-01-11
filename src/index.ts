@@ -24,6 +24,14 @@ app.use(express.json());
 app.use("/api", apiRouter);
 
 
+app.use("/", (req,res)=>{
+
+    res.send("guachingggggggggggggggggggggggggggggg!!!!")
+});
+
+
+
+
 import { setupGraphQL } from "./graphql/graphql";
 setupGraphQL(app);
 
@@ -37,6 +45,8 @@ const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });
+
+
 
 
 
