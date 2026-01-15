@@ -31,13 +31,16 @@ app.use("/api", apiRouter);
   // Configurar Express para servir los archivos estáticos
   app.use(express.static(staticPath))
   
+
+import { setupGraphQL } from "./graphql/graphql";
+setupGraphQL(app);
+
+
+
   // Para cualquier otra ruta, enviar el index.html de React
 app.get(/^(?!\/api\/).*/, (req, res) => {
   res.sendFile(path.join(staticPath, 'index.html'));
 });
-
-import { setupGraphQL } from "./graphql/graphql";
-setupGraphQL(app);
 
 
 import {errorHandler} from "./api/middlewares/errors.middleware";
@@ -56,8 +59,8 @@ app.listen(PORT, () => {
 import { initializeRoles } from "./scripts/roles";
 mongoose
   .connect(
-     app.get("enviroment") == "dev" ? 
-     String(process.env.MONGODB_URI) : String(process.env.MONGODB_PROD_URI)
+     process.env.ENVIROMENT == "dev" ? 
+     String(process.env.MONGODB_URI) : "mongodb+srv://pepelepu23:79AZ7W7D5VYlcW36@cluster0.pv1rna4.mongodb.net/?appName=Cluster0"
   )
   .then(() => {
     console.log("Conexión a MongoDB establecida con éxito");
