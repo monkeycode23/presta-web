@@ -176,7 +176,7 @@ export function ClientDetail() {
           clientId: clientId!,
           filter: filters.payments,
           pagination: {
-            page: pagination.payments.page,
+            page: pagination.payments.page ?? 1,
             limit: pagination.payments.pageSize ?? 5,
           },
         },
