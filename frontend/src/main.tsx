@@ -1,8 +1,8 @@
-import { StrictMode } from 'react'
+/* import { StrictMode } from 'react' */
 import './index.css'
   import { createRoot } from "react-dom/client";
   import App from "./App.tsx";
-  import { setContext } from "@apollo/client/link/context";
+  /* import { setContext } from "@apollo/client/link/context"; */
  import { ApolloProvider } from "@apollo/client/react"; 
 
   import { ApolloClient,  InMemoryCache, HttpLink } from "@apollo/client";

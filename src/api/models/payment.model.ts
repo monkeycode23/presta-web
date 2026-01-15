@@ -110,7 +110,6 @@ const pagoSchema = new mongoose.Schema<IPaymentDocument>(
     late_days: {
       type: Number,
       default: 0,
-      min: 0,
     },
     receipt_number: {
       type: String,

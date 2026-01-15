@@ -7,6 +7,7 @@ import { AuthMailer } from "../../../services/mail/auth.mail";
 import { TokenService } from "../../../services/token.service";
 import { AuthError } from "../../../errors/error.handler";
 import { ApiResponse } from "../../../utils/api.response";
+import lenderModel from "../../../models/lender.model";
 
 class RegisterAction {
   private user: any;
@@ -32,6 +33,7 @@ class RegisterAction {
 
       await this.user.save();
 
+      await this.createLender();
         
 
       ApiResponse.success(
@@ -50,6 +52,19 @@ class RegisterAction {
       next(error);
     }
   }
+
+   async createLender() {
+
+        const lender = new lenderModel({
+            user:this.user._id,
+            email:this.user.email
+        });
+
+
+        await lender.save()
+
+   }
+
 
   async generateTokens(res: Response) {
     const accessToken = await AuthService.generateAccessToken(

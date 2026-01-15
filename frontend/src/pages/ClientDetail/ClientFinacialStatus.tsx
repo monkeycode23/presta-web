@@ -1,7 +1,7 @@
 
 import React from 'react'
 import { formatCurrency } from '../../common/funcs';
-import { Calendar, DollarSign, Percent } from 'lucide-react';
+import { Calendar, DollarSign, Percent, Star } from 'lucide-react';
 import { useClientStore } from '../../store/client.store';
 
 
@@ -20,15 +20,15 @@ export default function ClientFinacialStatus() {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center gap-3 mb-3">
-            <div className="bg-indigo-100 p-2 rounded-lg">
-              <DollarSign className="w-5 h-5 text-indigo-600" />
+            <div className="bg-yellow-100 p-2 rounded-lg">
+              <Star className="w-5 h-5 text-yellow-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Total a Pagar</p>
-              <p className="text-gray-900">{formatCurrency(totalToPay)}</p>
+              <p className="text-sm text-gray-600">Reputacion</p>
+              <p className="text-gray-900">{100}</p>
             </div>
           </div>
-          <p className="text-xs text-gray-500">Capital + Intereses</p>
+          <p className="text-xs text-gray-500">Buena reputacion </p>
         </div>
 
         <div className="bg-white rounded-xl p-6 border border-gray-200">

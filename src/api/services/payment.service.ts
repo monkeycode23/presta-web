@@ -4,9 +4,25 @@ import Client from "../models/client.model";
 import Payment from "../models/payment.model";
 import PaginationService from "./pagination.service";
 import mongoose from "mongoose";
+import { IPaymentDocument } from "../../types/general";
 
 class PaymentService {
   constructor() {}
+
+
+  static calculateLateDays(payment:IPaymentDocument){
+
+    const d1 = new Date(payment.payment_date)
+    
+    const d2 = new Date(payment.paid_date!)
+
+    const diferenciaMs = d1.getTime() - d2.getTime();
+    const diferenciaDias = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
+
+    payment.late_days = diferenciaDias+1;
+
+    return diferenciaDias
+  }
 
   async getPaymentsStatus(args: any) {
     const { filter, pagination } = args;
@@ -179,7 +195,7 @@ if (clientIds.length) {
         select: "_id total_amount amount payment_interval",
       })
       .populate({ path: "client", select: "_id nickname" })
-      .populate({ path: "processed_by", select: "_id username avatar" })
+      .populate({ path: "processed_by", select: "_id username avatar email" })
 
       .skip(skip)
       .limit(limit);
@@ -237,7 +253,7 @@ if (clientIds.length) {
         select: "_id total_amount amount payment_interval",
       })
       .populate({ path: "client", select: "_id nickname" })
-      .populate({ path: "processed_by", select: "_id username avatar" })
+      .populate({ path: "processed_by", select: "_id username avatar email" })
 
       .skip(skip)
       .limit(limit);

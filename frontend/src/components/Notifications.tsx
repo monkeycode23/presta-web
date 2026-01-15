@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell, CheckCircle, TrendingUp, AlertCircle } from 'lucide-react';
-import { Notification } from '../App';
+import type{ Notification } from '../types/general';
 
 interface NotificationBellProps {
   notifications: Notification[];

@@ -17,7 +17,7 @@
   | "delete_loan"
   | "create_payment"
   | "view_payment"
-  | "edit_payment"
+  | "payment:edit"
   | "delete_payment"
   | "payment:pay"
    | "pay_payment"

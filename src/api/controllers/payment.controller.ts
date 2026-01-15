@@ -6,6 +6,11 @@ import { ApiResponse } from "../utils/api.response";
 import PayAction from "./actions/payments/pay.action";
 import { PaymentStatus } from "../models/payment.model";
 import Client from "../models/client.model";
+import { LoanStatus } from "../../types/general";
+import UpdateAction from "./actions/payments/update.action";
+
+
+
 
 class PaymentController {
   constructor() {}
@@ -57,40 +62,8 @@ class PaymentController {
   }
 
   updateAction() {
-    return async (req: Request, res: Response, next: any) => {
-      try {
-        const { paymentId } = req.params;
-
-        const updateData = req.body;
-        console.log(req.params, req.body);
-        // No permitir actualizar ciertos campos
-        /*  delete updateData.loan_id;
-        delete updateData.created_at;
-        delete updateData.updated_at; */
-
-        //console.log(pago_id)
-
-        const pago = await Payment.findByIdAndUpdate(paymentId, updateData, {
-          new: false,
-          /* runValidators: true, */
-        });
-
-        console.log(pago, "update  data");
-
-        if (!pago) throw new Error("payment not found");
-
-        ApiResponse.success(
-          res,
-          {
-            payment: pago,
-          },
-          "Payment updated successfully"
-        );
-      } catch (error) {
-        console.error("Error al actualizar pago:", error);
-        next(error);
-      }
-    };
+    const payment = new UpdateAction();
+        return  payment.request.bind(payment);
   }
 
   createAction() {

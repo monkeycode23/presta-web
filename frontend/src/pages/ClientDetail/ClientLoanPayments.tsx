@@ -6,11 +6,13 @@ import { usePaymentStore } from "../../store/payment.store";
 import Pagination from "../../components/Pagination";
 import PaymentFilterDropdown from "./PaymentsFilter";
 import { usePaginationFilterStore } from "../../store/pagination.filter";
+import { useClientStore } from "../../store/client.store";
 
 export default function ClientLoanPayments() {
   // const {currentLoan:selectedLoan,loans} = useLoanStore();
   const { payments } = usePaymentStore();
   const { pagination, filters ,setPage} = usePaginationFilterStore();
+  const {selectedClient} = useClientStore()
 
   useEffect(() => {
     
@@ -23,8 +25,8 @@ export default function ClientLoanPayments() {
 
   return (
     <>
-      {payments.length || filters.payments ? (
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
+      {selectedClient?.statics.payments.total  ? (
+        <div className="min-h-[300px] bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex justify-between  gap-3  items-center mb-4">
            <div>
             
@@ -56,7 +58,7 @@ export default function ClientLoanPayments() {
                   No se encontraron pagos
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  Aún no hay pagos registrados para este préstamo.
+                  No se encntraron resultados de pagos
                 </p>
               </div>
             ) : (

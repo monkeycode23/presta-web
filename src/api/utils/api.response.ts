@@ -9,7 +9,7 @@ type TApiResponse<T = any> = {
 
 export class ApiResponse {
   static success<T>(res: Response, data?: T, message?: string, status = 200) {
-    console.log(data)
+    //console.log(data)
     const response: TApiResponse<T> = {
       success: true,
       message,

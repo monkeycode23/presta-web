@@ -9,6 +9,13 @@ export interface GetPaymentsResponse {
   };
 }
 
+export interface GetPaymentsResponse2 {
+  getClientPayments: {
+    pagination: any;
+    data: IPayment[];
+  };
+}
+
 export interface GetPaymentsVars {
   clientId: string;
   filter: any;
@@ -45,10 +52,13 @@ export const GET_CLIENT_PAYMENTS = gql`
         payment_date
         interest_amount
         label
+
+        late_days
         processed_by{
             _id
             avatar
             username
+            email
         }
         loan{
             
@@ -102,10 +112,12 @@ export const GET_PAYMENTS = gql`
         payment_date
         interest_amount
         label
+        late_days
         processed_by{
             _id
             avatar
             username
+             email
         }
         loan{
             

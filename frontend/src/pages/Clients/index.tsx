@@ -154,7 +154,7 @@ export function ClientList() {
         }
        
       {/* Lista de clientes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6">
         {clients.map((client) => {
           //const stats = getClientStats(client._id);
           return <ClientCard key={client._id} client={client}></ClientCard>
@@ -186,7 +186,7 @@ export function ClientList() {
 
 
 
-
+/* 
  function Card({client}) {
 
     const stats = {
@@ -237,7 +237,7 @@ export function ClientList() {
                 onClick={() => { 
                     
                    // navigate("/clients/"+client.id) 
-                }}/* onViewClient(client.id) */
+                }}/* onViewClient(client.id) 
                 className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
               >
                
@@ -250,3 +250,4 @@ export function ClientList() {
            </div>  
   )
 }
+ */

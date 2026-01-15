@@ -9,9 +9,11 @@ export type TRequestMethod = "GET" | "POST" | "PUT" | "DELETE";
 // Usa la variable de entorno si existe, si no usa localhost
 const API_BASE_URL = /* import.meta.env.VITE_API_URL ||  */"http://localhost:2567/api";
 
+const API_PROD_BASE_URL = /* import.meta.env.VITE_API_URL ||  */"https://loanman.vercel.app/api";
+
 // Instancia de axios
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_PROD_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },

@@ -10,7 +10,7 @@ const DropdownNotification = () => {
  /*  const {socket,isConnected,} = useSocket() */
  // const {notifications,markNotificationsAsRead,fetchNotifications,setNotifications} = useSocket()	
   
-  const notifications =[]
+  const notifications:any =[]
   return (
    /*  <ClickOutside onClick={() => setDropdownOpen(false)} className="relative"> */
       <li>
@@ -56,7 +56,7 @@ const DropdownNotification = () => {
 </span>                      
                     </div>
                 )}
-              {notifications && notifications.map((notification)=>(
+              {notifications && notifications.map((notification:any)=>(
                 <Notification key={notification._id} type={notification.type} message={notification.message} />
               ))}
             </ul>
@@ -70,7 +70,7 @@ const DropdownNotification = () => {
 
 import { CheckCircle, XCircle, Info, AlertTriangle, Bell } from 'lucide-react';
 
-const typeStyles = {
+const typeStyles:any = {
   success: {
     icon: <CheckCircle className="text-green-500" />,
     bg: 'bg-green-100',
@@ -96,7 +96,7 @@ const typeStyles = {
     text: 'text-yellow-800',
   },
 };
- function Notification({ type = 'info', message }) {
+ function Notification({ type = 'info', message="" }) {
   const styles = typeStyles[type] || typeStyles.info;
 
   return (

@@ -37,7 +37,7 @@ export const GET_CLIENT_LOANS = gql`
       interest_amount
       status
       installment_number
-      
+      progress
       
       }
     }

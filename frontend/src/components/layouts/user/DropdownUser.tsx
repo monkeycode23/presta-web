@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 
 import UserOne from '../../../images/user/user-01.jpg';
 import { useNavigate } from 'react-router';
+import { useAuthStore } from '../../../store/auth.store';
 
 
 const DropdownUser = () => {
@@ -11,19 +12,13 @@ const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   
-  
-  function userLogout(){
-    
-   /*  dispatch(logout())
-    
+  const {user,logout} = useAuthStore();
 
-    navigate("/auth/singin") */
-  }
-
-  const user ={}
+ 
+ 
   
   return (
-   /*  <ClickOutside onClick={() => setDropdownOpen(false)} className="relative"> */
+  
    <>
       <Link
         onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -116,7 +111,7 @@ const DropdownUser = () => {
               </Link>
             </li>
           </ul>
-          <button onClick={userLogout} className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+          <button onClick={()=>logout()} className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
             <svg
               className="fill-current"
               width="22"

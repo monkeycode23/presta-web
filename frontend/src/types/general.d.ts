@@ -9,6 +9,18 @@ export interface User {
   roles: string[];
 }
 
+
+
+export interface ILender {
+  email: string;
+  avatar: string;
+  username?: string;
+  _id?: string;
+  emailVerified?: boolean;
+  roles: string[];
+}
+
+
 // types/payment.ts
 export enum PaymentMethod {
   CASH = "cash",
@@ -70,7 +82,7 @@ export interface IPayment {
   transaction_id?: string;
   notes?: string;
 
-  processed_by?: string;
+  processed_by?: User;
   user_id?: string;
 
   comprobantes: PaymentReceipt[];

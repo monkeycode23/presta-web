@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
-function Tabs({ tabs = [], defaultTab = '', className = '' }) {
-  const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id);
+function Tabs({ tabs = [], defaultTab = '', className = '' }:{tabs:any, defaultTab :string, className:string}) {
+  const [activeTab, setActiveTab] = useState<any>(defaultTab || tabs[0]?.id);
 
   if (!tabs || tabs.length === 0) return null;
 
   return (
     <div className={`tabs-wrapper ${className}`}>
       <div className="flex border-b border-gray-200 dark:border-gray-700 space-x-4 mb-4">
-        {tabs.map(tab => (
+        {tabs.map((tab:any) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -24,7 +24,7 @@ function Tabs({ tabs = [], defaultTab = '', className = '' }) {
       </div>
 
       <div className="tab-content">
-        {tabs.find(tab => tab.id === activeTab)?.content}
+        {tabs.find((tab:any) => tab.id === activeTab)?.content}
       </div>
     </div>
   );

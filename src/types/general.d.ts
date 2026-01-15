@@ -121,6 +121,7 @@ export interface IClient extends Document {
   // Métodos (si luego los reactivas)
   comparePassword?: (candidatePassword: string) => Promise<boolean>;
 }
+export type LoanStatus = "pending" | "active" | "completed" | "cancelled";
 
 export interface ILoanDocument extends Document {
   _id:  Types.ObjectId;
@@ -145,19 +146,7 @@ progress:number;
   interest_rate: number;
   term?: string;
 
-  status:
-    | "Pendiente"
-    | "pending"
-    | "active"
-    | "completed"
-    | "cancelled"
-    | "refounded"
-    | "Aprobado"
-    | "Rechazado"
-    | "En curso"
-    | "Pagado"
-    | "Vencido"
-    | "Cancelado";
+  status:LoanStatus;
 
   payment_interval:
     | "daily"

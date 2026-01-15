@@ -23,6 +23,7 @@ interface PayPaymentModalProps {
 
 import { PayPaymentSchema } from "../../errors/schemas/payment.schema";
 import ErrorMessage from "../Clients/AddClientModal";
+import { useAuthStore } from "../../store/auth.store";
 
 const PayPaymentModal: React.FC<PayPaymentModalProps> = ({ payment }) => {
 
@@ -33,12 +34,15 @@ const PayPaymentModal: React.FC<PayPaymentModalProps> = ({ payment }) => {
   const paymentStore = usePaymentStore()
   const loanStore = useLoanStore()
   const clientStore = useClientStore()
+  const authStore = useAuthStore()
+
+  const {user} = authStore
 
     const {values,handleSubmit:submit,setValue,errors} = useForm({
         name:"PAY_PAYMENT"+payment._id,
         schema:PayPaymentSchema,
         initialValues:{
-        amount:payment.amount,
+        amount:payment.status == "incomplete" ? payment.left_amount : payment.amount ,
         payment_method:"cash",
         notes:"",
        
@@ -56,11 +60,11 @@ const PayPaymentModal: React.FC<PayPaymentModalProps> = ({ payment }) => {
 
   const onDate =
     today.toISOString().split("T")[0] == payment.payment_date.split("T")[0];
-  console.log(
+ /*  console.log(
     onDate,
     today.toISOString().split("T")[0],
     payment.payment_date.split("T")[0]
-  );
+  ); */
   // Validación del monto
   
 
@@ -74,15 +78,26 @@ const PayPaymentModal: React.FC<PayPaymentModalProps> = ({ payment }) => {
         method:"POST"
     },(data:any)=>{
         
-        console.log(data)
-        const {payment,client,loan} = data.data
+     //   console.log(data)
+        const {payment:_payment,client,loan} = data.data
 
-        paymentStore.updatePayment(payment._id,payment)
+        paymentStore.updatePayment(_payment._id,{
+            ..._payment,
+            loan:{
+                ...payment.loan
+            },
+            processed_by:{
+                _id:user?._id,
+                avatar:user?.avatar,
+                username:user?.username
+
+            }
+        })
         loanStore.updateLoan(loan._id,loan)
 
-/* 
-        clientStore.updateClient(data.client._id,data.client)
- */
+         clientStore.updateClient(client._id,client)
+
+       
         /////////////////////actualizar datos 
     })
     setAmount(0);
@@ -119,7 +134,7 @@ const PayPaymentModal: React.FC<PayPaymentModalProps> = ({ payment }) => {
               />
               <button
                 type="button"
-                onClick={() => setAmount(payment.total_amount)}
+                onClick={() => setValue("amount",payment.total_amount-payment.paid_amount)}
                 className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
               >
                 $

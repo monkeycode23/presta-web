@@ -15,6 +15,8 @@ dotenv.config();
 
 const app = express();
 
+app.set("enviroment",process.env.ENVIROMENT)
+
 app.use(cors());
 app.use(morgan("dev"));
 app.use(cookieParser());
@@ -23,6 +25,16 @@ app.use(express.json());
 
 app.use("/api", apiRouter);
 
+
+  const staticPath = path.resolve(__dirname, '../frontend/dist')
+  
+  // Configurar Express para servir los archivos estáticos
+  app.use(express.static(staticPath))
+  
+  // Para cualquier otra ruta, enviar el index.html de React
+app.get(/^(?!\/api\/).*/, (req, res) => {
+  res.sendFile(path.join(staticPath, 'index.html'));
+});
 
 import { setupGraphQL } from "./graphql/graphql";
 setupGraphQL(app);
@@ -34,13 +46,19 @@ app.use(errorHandler)
 const PORT = process.env.SERVER_PORT || 5000;
 // Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en http://localhost:${PORT}`);
+  console.log(`Servidor escuchando en ${
+    app.get("enviroment") == "dev" 
+    ? process.env.SERVER_DOMAIN : process.env.SERVER_PROD_DOMAIN
+}:${PORT}`);
 });
 
 
 import { initializeRoles } from "./scripts/roles";
 mongoose
-  .connect(process.env.MONGODB_URI ?? "mongodb://localhost:27017/presta")
+  .connect(
+     app.get("enviroment") == "dev" ? 
+     String(process.env.MONGODB_URI) : String(process.env.MONGODB_PROD_URI)
+  )
   .then(() => {
     console.log("Conexión a MongoDB establecida con éxito");
 

@@ -9,6 +9,7 @@ import {
   Pencil,
   Trash2,
   Eye,
+  ClockAlert,
 } from "lucide-react";
 
 import { formatCurrency } from "../../common/funcs";
@@ -18,9 +19,17 @@ import { usePaginationFilterStore } from "../../store/pagination.filter";
 import Pagination from "../../components/Pagination";
 import Dropdown from "../../components/Dropdowns/Dropdown";
 import PayPaymentModal from "../ClientDetail/PayPaymentModal";
+import { request } from "../../services/api/request";
+import { useClientStore } from "../../store/client.store";
+import { useLoanStore } from "../../store/loan.store";
 
 export function PaymentsList() {
-  const { payments, paymentsStatus } = usePaymentStore();
+  const { payments, paymentsStatus, updatePayment, selectedPayments } =
+    usePaymentStore();
+
+  const { updateClient } = useClientStore();
+
+  const { updateLoan } = useLoanStore();
 
   const { filters, pagination, setPage } = usePaginationFilterStore();
 
@@ -32,6 +41,35 @@ export function PaymentsList() {
   });
 
   console.log(paymentStatusDate);
+
+  const onPending = async (payment: any) => {
+    try {
+      const response = await request({
+        url: "/payments/" + payment?._id,
+        method: "PUT",
+        data: {
+          status: "pending",
+        },
+      });
+
+      console.log(response);
+
+      if (!response.success) throw new Error(response.message);
+
+      updatePayment(payment?._id, {
+        ...response.data.payment,
+        loan: {
+          ...payment?.loan,
+        },
+      });
+
+      updateClient(response.data.client._id, response.data.client);
+
+      updateLoan(response.data.loan._id, response.data.loan);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -148,19 +186,27 @@ export function PaymentsList() {
                     </div>
                   </div>
 
-                  <Dropdown right top={30}>
-                    <div className="flex  gap-2 p-2">
+                  <Dropdown right={true} top={40} className="ml-3">
+                    <div className="flex gap-3 p-3 shadow-2xl">
                       {payment.status !== "paid" && (
                         <PayPaymentModal payment={payment} />
                       )}
-                      <button className="text-sm hover:text-yellow-600 flex gap-1">
-                        editar <Pencil width={14} />
-                      </button>
-                      <button className="text-sm hover:text-red-600 flex gap-1">
-                        eliminar <Trash2 width={14} />
-                      </button>
-                      <button className="text-sm hover:text-gray-600 flex gap-1">
-                        ver <Eye width={14} />
+
+                      {(payment.status === "paid" ||
+                        payment.status === "incomplete") && (
+                        <button
+                          onClick={() => onPending(payment)}
+                          className="flex gap-1 text-sm hover:text-blue-600 cursor-pointer"
+                        >
+                          pendiente <ClockAlert width={15} className="" />
+                        </button>
+                      )}
+
+                      {/* <button className="flex gap-1 text-sm hover:text-red-600 cursor-pointer">
+              eliminar <Trash2 width={15} />
+            </button> */}
+                      <button className="flex gap-1 text-sm hover:text-gray-600 cursor-pointer">
+                        ver <Eye width={15} />
                       </button>
                     </div>
                   </Dropdown>
@@ -208,3 +254,5 @@ function Calendar({ className }: { className?: string }) {
     </svg>
   );
 }
+
+

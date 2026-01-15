@@ -1,6 +1,6 @@
 import React from "react";
 
-const Tooltip = ({ text, children, position = "bottom" }) => {
+const Tooltip = ({ text, children, position = "bottom" }:{ text:string, children:any, position :string}) => {
   return (
     <div className="flex justify-center items-center ">
       <div className="relative group">

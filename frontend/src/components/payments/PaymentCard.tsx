@@ -51,7 +51,7 @@ import { setBruteGains, setNetGains } from "../../../redux/reducers/payments"; *
 import { setNotes,deletePayment } from "../../../redux/reducers/payments";
 import { setTotalResults } from "../../../redux/reducers/_pagination";
  */
-const PaymentCard = ({ payment }) => {
+const PaymentCard = ({ payment }:any) => {
   const [hasNotes, setHasNotes] = useState(false);
  /*  const loan = useSelector((state) => state.loans.loan);
   const { bruteGains, netGains } = useSelector((state) => state.payments);
@@ -69,7 +69,7 @@ const PaymentCard = ({ payment }) => {
     checkNotes();
   }, [payment.id]);
 
-  const pay = async (e) => {
+  const pay = async (e:any) => {
    /*  const isCompleted = await payPayment(payment.id, loan);
     //console.log("isCompleted--a>>", isCompleted);
 
@@ -428,7 +428,7 @@ export default PaymentCard;
 */
 
 
- export function BaselineAssignment(props) {
+ export function BaselineAssignment(props:any) {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -446,7 +446,7 @@ export default PaymentCard;
   }
   
 
-  export function BaselineFactCheck(props) {
+  export function BaselineFactCheck(props:any) {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -465,7 +465,7 @@ export default PaymentCard;
   }
 
   
-  export function OutlinePending(props) {
+  export function OutlinePending(props:any) {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -485,7 +485,7 @@ export default PaymentCard;
     )
   }
   
-    export function OutlineCheck(props) {
+    export function OutlineCheck(props:any) {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -503,7 +503,7 @@ export default PaymentCard;
   }
 
   
-export const ExpiredDate = (props) => (
+export const ExpiredDate = (props:any) => (
   <svg
     version="1.0"
     id="Layer_1"

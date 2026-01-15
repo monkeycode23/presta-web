@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 
 import { ILoanDocument } from "../../types/general";
 
+
+
 const prestamoSchema = new mongoose.Schema<ILoanDocument>(
   {
     label: {

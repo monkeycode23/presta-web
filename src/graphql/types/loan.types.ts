@@ -31,7 +31,7 @@ export const LoanTypeDefs = gql`
     description: String
     purpose: String
     collateral: String
-
+    progress:Int
     next_payment_date: Date
     last_payment_date: Date
 

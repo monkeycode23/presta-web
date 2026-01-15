@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Pencil, Plus, X } from "lucide-react";
+import { Key, Pencil, Plus, X } from "lucide-react";
 import type { Loan, PaymentFrequency } from "../../types/general";
 import Modal from "../../components/Modal";
 import { useForm } from "../../hooks/useForm";
@@ -19,57 +19,63 @@ import useFormStore from "../../store/form2.store";
 }
  */
 
-type PaymentInterval = 
-"unique"
-     | "daily"
-      |"weekly"
-      |"monthly"
-      |"fortnightly"
-      |"custom"
+type PaymentInterval =
+  | "unique"
+  | "daily"
+  | "weekly"
+  | "monthly"
+  | "fortnightly"
+  | "custom";
 
 export function EditLoanModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);
- 
-  const clientStre = useClientStore()
-  const loanStore = useLoanStore()
-  const {currentLoan} = loanStore
-  const paymentStore = usePaymentStore()
-  const {selectedClient} = useClientStore()
-    const MODAL_NAME = "EDIT_LOAN"
 
-    const {setForm} = useFormStore()
+  const clientStre = useClientStore();
+  const loanStore = useLoanStore();
+  const { currentLoan } = loanStore;
+  const paymentStore = usePaymentStore();
+  const { selectedClient } = useClientStore();
+  const MODAL_NAME = "EDIT_LOAN";
 
-    const {openModal,setModal,modals,closeModal,} = useModalStore()
 
-    //const initialValues = React.useMemo(() => (), [currentLoan]);
 
-    console.log(currentLoan)
+
+  const { openModal, setModal, modals, closeModal, } = useModalStore();
+  const { forms, setForm ,submit,setValue:_changeValue} = useFormStore();
+
+  //const initialValues = React.useMemo(() => (), [currentLoan]);
   const {
-    values,
+    inputs: values,
     errors,
     loading,
-    setValue,
-    handleSubmit: _handleSubmit,
-  } = useForm({
-    name: MODAL_NAME ,
-    schema: EditLoanSchema,
-    initialValues:{
-  amount: currentLoan?.amount ?? "",
-  interest_rate: currentLoan?.interest_rate ?? "",
-  payment_interval: currentLoan?.payment_interval ?? "monthly",
-  installments: currentLoan?.installment_number ?? "",
-  disbursement_date: currentLoan?.disbursement_date ?? "",
-  first_payment_date: currentLoan?.first_payments_date ?? "",
-},
-  });
+  } = forms[MODAL_NAME] ?? {
+    inputs: {},
+    errors: {},
+    loading: false,
+  };
 
-  
 
-useEffect(() => {
-  setModal(MODAL_NAME)
-}, [])
-  
 
+
+  console.log(currentLoan);
+
+
+  useEffect(() => {
+    setModal(MODAL_NAME);
+
+    setForm(MODAL_NAME, {
+      inputs: {
+        amount: currentLoan?.amount ?? "",
+        interest_rate: currentLoan?.interest_rate ?? "",
+        payment_interval: currentLoan?.payment_interval ?? "monthly",
+        installments: currentLoan?.installment_number ?? "",
+        disbursement_date: currentLoan?.disbursement_date!.split("T")[0] ?? "",
+        first_payment_date: currentLoan?.first_payments_date!.split("T")[0] ?? "",
+      },
+      errors: {},
+      loading: false,
+    });
+  }, [currentLoan?._id]);
 
   const calculateTotal = () => {
     const amount = Number(values.amount) || 0;
@@ -77,106 +83,94 @@ useEffect(() => {
     return amount + (amount * interest) / 100;
   };
 
-   const calculateCuota = () => {
+  const calculateCuota = () => {
     const amount = Number(values.amount) || 0;
     const interest = Number(values.interest_rate) || 0;
     const total = amount + (amount * interest) / 100;
-    return Math.floor(total / values.installments!)
+    return Math.floor(total / values.installments!);
   };
 
-   const calculateInterest = () => {
+  const calculateInterest = () => {
     const amount = Number(values.amount) || 0;
     const interest = Number(values.interest_rate) || 0;
     return (amount * interest) / 100;
   };
 
-const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
-  const total_amount = calculateTotal();
 
-  _handleSubmit(
-    {
-      url: "/loans",
-      method: "POST",
-    },
-    (data: any) => {
-      console.log(data);
 
-      loanStore.addLoan(data.data.loan);
-      
-
-      const payments = data.data.payments.map((p:any)=>{
-        return {
-            ...p,
-            loan:{
-                total_amount,
-                amount:values.amount,
-                payment_interval:values.payment_interval
-                
-            }
-        }
-      })
-
-      
-      paymentStore.setPayments(payments);
-
-      if (clientStre.selectedClient) {
-        const statics = clientStre.selectedClient.statics;
-
-        // Actualizamos el cliente con los nuevos datos de statics
-        clientStre.updateClient(clientStre.selectedClient._id, {
-          statics: {
-            ...statics,
-            loans: {
-              ...statics.loans,
-              total: statics.loans.total + 1,
-              active: statics.loans.active + 1,
-            },
-            payments: {
-              ...statics.payments,
-              total: statics.payments.total + values.installments!,
-              pending: statics.payments.pending + values.installments!,
-            },
-            amounts: {
-              ...statics.amounts,
-              client_debt: Number(statics.amounts.client_debt) + calculateTotal(),
-              total_lent:Number( statics.amounts.total_lent) + Number(values.amount),
-            },
-          },
-        });
-      }
-
-      setIsModalOpen(false);
-    }
-  );
-};
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("es-ES", ).format(value);
+    const setValue = (key:string,value:any) => {
+        _changeValue(MODAL_NAME,key,value)
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const total_amount = calculateTotal();
 
-  
+
+
+
+    /* _handleSubmit(
+      {
+        url: "/loans",
+        method: "POST",
+      },
+      (data: any) => {
+        console.log(data);
+
+        loanStore.addLoan(data.data.loan);
+
+        const payments = data.data.payments.map((p: any) => {
+          return {
+            ...p,
+            loan: {
+              total_amount,
+              amount: values.amount,
+              payment_interval: values.payment_interval,
+            },
+          };
+        });
+
+        paymentStore.setPayments(payments);
+
+        if (clientStre.selectedClient) {
+          const statics = clientStre.selectedClient.statics;
+
+          // Actualizamos el cliente con los nuevos datos de statics
+          clientStre.updateClient(clientStre.selectedClient._id, {
+            statics: {
+              ...statics,
+              loans: {
+                ...statics.loans,
+                total: statics.loans.total + 1,
+                active: statics.loans.active + 1,
+              },
+              payments: {
+                ...statics.payments,
+                total: statics.payments.total + values.installments!,
+                pending: statics.payments.pending + values.installments!,
+              },
+              amounts: {
+                ...statics.amounts,
+                client_debt:
+                  Number(statics.amounts.client_debt) + calculateTotal(),
+                total_lent:
+                  Number(statics.amounts.total_lent) + Number(values.amount),
+              },
+            },
+          });
+        }
+
+        setIsModalOpen(false);
+      }
+    ); */
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("es-ES").format(value);
+  };
 
   return (
     <>
-
-  {/*  <button
-        onClick={(event) => {
-             event.stopPropagation(); 
-            
-            setIsModalOpen(true)}}
-        className="
-              flex items-center gap-3
-              w-full px-4 py-2
-             
-              transition
-            "
-      >
-        <Pencil size={16} />
-        Editar
-      </button>
- */}
       <Modal open={modals[MODAL_NAME] && modals[MODAL_NAME].isOpen}>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-gray-900">Editar Préstamo</h3>
@@ -198,53 +192,53 @@ const handleSubmit = (e: React.FormEvent) => {
             </label>
             <input
               type="number"
-              
               min="10000"
               step="1000"
-              value={values && values.amount }
+              value={values && values.amount}
               onChange={(e) => setValue("amount", e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="5000.00"
             />
-            {errors && errors.amount && <ErrorMessage message={errors.amount} />}
+            {errors && errors.amount && (
+              <ErrorMessage message={errors.amount} />
+            )}
           </div>
 
           <div className="flex gap-1">
             <div>
-            <label className="block text-sm text-gray-700 mb-1">
-              Tasa de interés (%) *
-            </label>
-            <input
-              type="number"
-              min="0"
-              step="0.1"
-              value={values && values.interest_rate}
-              onChange={(e) => setValue("interest_rate", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="15"
-            />
-            {errors && errors.interest_rate && (
-              <ErrorMessage message={errors.interest_rate} />
-            )}
-          </div>
+              <label className="block text-sm text-gray-700 mb-1">
+                Tasa de interés (%) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={values && values.interest_rate}
+                onChange={(e) => setValue("interest_rate", e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="15"
+              />
+              {errors && errors.interest_rate && (
+                <ErrorMessage message={errors.interest_rate} />
+              )}
+            </div>
 
             <div>
-            <label className="block text-sm text-gray-700 mb-1">
-              Número de cuotas *
-            </label>
-            <input
-              type="number"
-              
-              min="1"
-              value={values && values.installments}
-              onChange={(e) => setValue("installments", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="10"
-            />
-            { errors &&  errors.installments && (
-              <ErrorMessage message={errors.installments} />
-            )}
-          </div>
+              <label className="block text-sm text-gray-700 mb-1">
+                Número de cuotas *
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={values && values.installments}
+                onChange={(e) => setValue("installments", e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="10"
+              />
+              {errors && errors.installments && (
+                <ErrorMessage message={errors.installments} />
+              )}
+            </div>
           </div>
 
           <div>
@@ -264,10 +258,7 @@ const handleSubmit = (e: React.FormEvent) => {
               <option value="fortnightly">Quincenal</option>
               <option value="custom">Indefinida</option>
             </select>
-           
           </div>
-
-        
 
           <div className="flex gap-1">
             <div className="w-full">
@@ -277,7 +268,6 @@ const handleSubmit = (e: React.FormEvent) => {
               <input
                 title="date"
                 type="date"
-              
                 value={values && values.disbursement_date}
                 onChange={(e) => setValue("disbursement_date", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -290,22 +280,17 @@ const handleSubmit = (e: React.FormEvent) => {
               <input
                 title="date"
                 type="date"
-              
                 value={values && values.first_payment_date}
                 onChange={(e) => setValue("first_payment_date", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-             
             </div>
-
-            
-            
           </div>
           <div>
-             { errors && errors.payment_interval && (
+            {errors && errors.payment_interval && (
               <ErrorMessage message={errors.payment_interval} />
             )}
-             { errors && errors.first_payment_date && (
+            {errors && errors.first_payment_date && (
               <ErrorMessage message={errors.first_payment_date} />
             )}
           </div>
@@ -340,7 +325,7 @@ const handleSubmit = (e: React.FormEvent) => {
                     Cuota {values.payment_interval}:
                   </span>
                   <span className="text-gray-900">
-                    {(formatCurrency(calculateCuota()))}
+                    {formatCurrency(calculateCuota())}
                   </span>
                 </div>
               )}

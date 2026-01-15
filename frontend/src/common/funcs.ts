@@ -9,3 +9,5 @@ export const formatCurrency = (value: number) => {
       currency: 'USD',
     }).format(value);
   };
+
+

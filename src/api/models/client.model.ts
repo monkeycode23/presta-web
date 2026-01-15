@@ -114,6 +114,7 @@ const clienteSchema = new mongoose.Schema<IClient>(
         overdue_debt: { type: Number, default: 0 ,min: 0,},
         net_gain: { type: Number, default: 0 ,min: 0,},
         gross_gain: { type: Number, default: 0,min: 0, },
+        total_interest:{ type: Number, default: 0,min: 0, },
       },
       reputation: {
         score: { type: Number, default: 100 ,min: 0,},

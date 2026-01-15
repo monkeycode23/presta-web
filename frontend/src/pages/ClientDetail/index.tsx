@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  ArrowLeft,
-
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { AddLoanModal } from "./AddLoanModal";
 
@@ -15,14 +12,29 @@ import ClientInformation from "./ClientInformation";
 import ClientLoansList from "./ClientLoansList";
 import ClientLoanPayments from "./ClientLoanPayments";
 import { useQuery, useLazyQuery } from "@apollo/client/react";
-import { GET_CLIENT,type GetClientResponse,type GetClientVars } from "../../graphql/client.queries";
+import {
+  GET_CLIENT,
+  type GetClientResponse,
+  type GetClientVars,
+} from "../../graphql/client.queries";
 import { useAuthStore } from "../../store/auth.store";
-import { GET_CLIENT_LOANS, type GetLoansResponse, type GetLoansVars } from "../../graphql/loan.queries";
+import {
+  GET_CLIENT_LOANS,
+  type GetLoansResponse,
+  type GetLoansVars,
+} from "../../graphql/loan.queries";
 import { useLoanStore } from "../../store/loan.store";
-import { GET_CLIENT_PAYMENTS, type GetPaymentsResponse, type GetPaymentsVars } from "../../graphql/payments.queries";
+import {
+  GET_CLIENT_PAYMENTS,
+  type GetPaymentsResponse,
+  type GetPaymentsResponse2,
+  type GetPaymentsVars,
+} from "../../graphql/payments.queries";
 import { usePaymentStore } from "../../store/payment.store";
 import { usePaginationFilterStore } from "../../store/pagination.filter";
 import { EditLoanModal } from "./EditLoanModal";
+import { EditPaymentModal } from "./EditPaymentModal";
+import { ViewPaymentModal } from "./ViewPaymentModal";
 
 /* interface ClientDetailProps {
   client: Client;
@@ -35,180 +47,164 @@ import { EditLoanModal } from "./EditLoanModal";
  */
 
 export function ClientDetail() {
-
   const { clientId } = useParams();
 
   const authStore = useAuthStore();
-  const { selectedClient: client,selectClient } = useClientStore();
+  const { selectedClient: client, selectClient } = useClientStore();
 
-  const {setLoans,loans,setCurrentLoan } = useLoanStore()
-  const {setFilters, pagination,filters,resetFilters,setPage,setTotalPages,setTotal,setPagination} = usePaginationFilterStore()
-    const {setPayments} = usePaymentStore()
+  const { setLoans, loans, setCurrentLoan } = useLoanStore();
+  const {
+    setFilters,
+    pagination,
+    filters,
+    resetFilters,
+    setPage,
+    setTotalPages,
+    setTotal,
+    setPagination,
+  } = usePaginationFilterStore();
+  const { setPayments } = usePaymentStore();
 
-//client info
+  //client info
   const [_user, { data, loading, error }] = useLazyQuery<
     GetClientResponse,
     GetClientVars
   >(GET_CLIENT, {
     fetchPolicy: "network-only", // 🔥
   });
- 
-//loans
- const [getLoans, { data:_data, loading:_loading, error:_error }] = useLazyQuery<
-    GetLoansResponse,
-    GetLoansVars
-  >(GET_CLIENT_LOANS, {
-    fetchPolicy: "network-only", // 🔥
-  });
+
+  //loans
+  const [getLoans, { data: _data, loading: _loading, error: _error }] =
+    useLazyQuery<GetLoansResponse, GetLoansVars>(GET_CLIENT_LOANS, {
+      fetchPolicy: "network-only", // 🔥
+    });
 
   //client payments
-   const [getPayments, { data:data_p, loading:loading_p, error:error_p }] = useLazyQuery<
-    GetPaymentsResponse,
-    GetPaymentsVars
-  >(GET_CLIENT_PAYMENTS, {
-    fetchPolicy: "network-only", // 🔥
-  });
-
+  const [getPayments, { data: data_p, loading: loading_p, error: error_p }] =
+    useLazyQuery<GetPaymentsResponse2, GetPaymentsVars>(GET_CLIENT_PAYMENTS, {
+      fetchPolicy: "network-only", // 🔥
+    });
 
   useEffect(() => {
-    
-    setCurrentLoan(null)
-    resetFilters("loans")
-     resetFilters("payments")
-    
-    setFilters({
-        order:"newest",
-        status:[],
-        disbursementDate:{
-            from:"",
-            to:""
-        },
-        amount:{
-            from:0,
-            to:0
-        },
-        installments:{
-             from:0,
-            to:0
-        }
-        
-    },"loans")
-  
-    setFilters({
-        loanId:"",
-        order:"newest",
-        status:[],
-        
-        
-    },"payments")
-     
-    return () => {
-      
-    }
-  }, [])
-  
+    setCurrentLoan(null);
+    resetFilters("loans");
+    resetFilters("payments");
 
-   useEffect(() => {
+    setFilters(
+      {
+        order: "newest",
+        status: [],
+        disbursementDate: {
+          from: "",
+          to: "",
+        },
+        amount: {
+          from: 0,
+          to: 0,
+        },
+        installments: {
+          from: 0,
+          to: 0,
+        },
+      },
+      "loans"
+    );
+
+    setFilters(
+      {
+        loanId: "",
+        order: "newest",
+        status: [],
+      },
+      "payments"
+    );
+
+    return () => {};
+  }, []);
+
+  useEffect(() => {
     if (!authStore.user) return;
 
     const fetch = async () => {
-      
       const response: any = await _user({
         variables: {
-          clientId:clientId!,
-         
+          clientId: clientId!,
         },
       });
 
-     
       if (data) {
         const client = data.getClient;
         selectClient(client ?? null);
-        
       }
     };
 
-   fetch();
+    fetch();
 
-    return () => {
-      
-    };
-  }, [authStore.user, data ]);
-
+    return () => {};
+  }, [authStore.user, data]);
 
   /** get loans */
-   useEffect(() => {
+  useEffect(() => {
     if (!authStore.user) return;
 
     const fetch = async () => {
-      
       const response: any = await getLoans({
         variables: {
-          clientId:clientId!,
-         filter:filters.loans
+          clientId: clientId!,
+          filter: filters.loans,
         },
       });
 
-     
       if (_data) {
         const loans = _data.getClientLoans;
-        console.log(loans,"asdajsbdakjsdbas")
+        console.log(loans, "asdajsbdakjsdbas");
         setLoans(loans.data ?? null);
-
-        
       }
     };
 
-   fetch();
+    fetch();
 
-    return () => {
-      
-    };
-  }, [authStore.user, _data ,filters.loans,pagination.loans]);
+    return () => {};
+  }, [authStore.user, _data, filters.loans, pagination.loans]);
 
-
-    useEffect(() => {
+  useEffect(() => {
     if (!authStore.user) return;
 
     const fetch = async () => {
-      
       const response: any = await getPayments({
         variables: {
-          clientId:clientId!,
-         filter:filters.payments,
-         pagination:{
-            page:pagination.payments.page,
-            limit:pagination.payments.pageSize ?? 5
-         }
+          clientId: clientId!,
+          filter: filters.payments,
+          pagination: {
+            page: pagination.payments.page,
+            limit: pagination.payments.pageSize ?? 5,
+          },
         },
       });
 
-     
       if (data_p) {
         const loans = data_p.getClientPayments;
-       
 
         setPayments(loans.data ?? null);
         /* 
         setTotalPages(loans.pagination.totalPages,"payments")
         setTotal(loans.pagination.total,"payments") */
 
-        setPagination({
-            totalPages:loans.pagination.totalPages,
-            total:loans.pagination.total,
-            pageSize:loans.pagination.limit
-        },"payments")
-        
+        setPagination(
+          {
+            totalPages: loans.pagination.totalPages,
+            total: loans.pagination.total,
+            pageSize: loans.pagination.limit,
+          },
+          "payments"
+        );
       }
     };
 
-   fetch();
+    fetch();
 
-    return () => {
-      
-    };
-  }, [authStore.user, data_p,filters.payments,pagination.payments.page ]);
-
+    return () => {};
+  }, [authStore.user, data_p, filters.payments, pagination.payments.page]);
 
   if (!client) return;
 
@@ -230,31 +226,35 @@ export function ClientDetail() {
           </p>
         </div>
 
-       {
-         loans.length != 0 && <AddLoanModal />
-       }
+        {loans.length != 0 && <AddLoanModal />}
       </div>
 
       {/* Información del Cliente */}
       {/* <ClientInformation client={client}></ClientInformation> */}
 
-      {loans.length  ? (
+      {loans.length ? (
         <>
           {/* Estadísticas del Cliente */}
-            <ClientStatics></ClientStatics> 
+          <ClientStatics></ClientStatics>
           {/* Detalles Financieros */}
 
-            <ClientFinacialStatus></ClientFinacialStatus>
+          <ClientFinacialStatus></ClientFinacialStatus>
         </>
-      ):(<></>)}
+      ) : (
+        <></>
+      )}
 
       {/* Lista de Préstamos */}
 
-        <ClientLoansList></ClientLoansList>
+      <ClientLoansList></ClientLoansList>
       {/* Cronograma de Pagos */}
-        <ClientLoanPayments></ClientLoanPayments>
+      <ClientLoanPayments></ClientLoanPayments>
 
-        <EditLoanModal ></EditLoanModal>
+      <EditLoanModal></EditLoanModal>
+
+      <EditPaymentModal></EditPaymentModal>
+
+      <ViewPaymentModal></ViewPaymentModal>
     </div>
   );
 }

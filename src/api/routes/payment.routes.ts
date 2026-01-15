@@ -21,9 +21,9 @@ router.post('/pay/:paymentId',
      paymentController.payAction()
     );
 
-router.put('/:id', 
-    [authRequired,requirePermissionRole("edit_payment")], 
-    paymentController.createAction());
+router.put('/:paymentId', 
+    [authRequired,requirePermissionRole("payment:edit")], 
+    paymentController.updateAction());
 
 router.delete('/:paymentId', 
     [authRequired,requirePermissionRole("delete_payment")], 

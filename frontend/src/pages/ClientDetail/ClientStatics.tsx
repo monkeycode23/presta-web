@@ -11,14 +11,19 @@ export default function ClientStatics() {
     const {selectedClient,clients} = useClientStore()
 
     const statics = selectedClient?.statics
+    console.log(statics)
 
+    const tasaPagos = statics?.payments.paid !=0 ?
+     statics?.payments.paid! /(statics?.payments.paid!+statics?.payments.expired!)*100
+    :0
+    console.log(tasaPagos)
    useEffect(() => {
      
    
      return () => {
        
      }
-   }, [clients,selectedClient])
+   }, [])
    
 
 
@@ -54,7 +59,7 @@ export default function ClientStatics() {
             </div>
           </div>
           <div className="pt-3 border-t border-white/20">
-            <p className="text-sm text-green-100">{clientPayments.filter(p => p.status === 'pagada').length} pagos realizados</p>
+            <p className="text-sm text-green-100">{clientPayments.filter((p:any) => p.status === 'pagada').length} pagos realizados</p>
           </div>
         </div>
 
@@ -81,7 +86,7 @@ export default function ClientStatics() {
             <div className="text-right">
               <p className="text-purple-100 text-sm">Tasa de Pago</p>
               <p className="text-2xl mt-1">{/* paymentRate.toFixed(1) */}{
-              statics?.payments && statics?.payments.paid! /(statics?.payments.paid!+statics?.payments.expired!)*100
+              tasaPagos ?? 0
             }%</p>
             </div>
           </div>
