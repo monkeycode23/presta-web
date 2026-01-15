@@ -8,8 +8,12 @@ import './index.css'
   import { ApolloClient,  InMemoryCache, HttpLink } from "@apollo/client";
 import { Toaster } from 'sonner';
 
+const API_BASE_URL = /* import.meta.env.VITE_API_URL ||  */"http://localhost:2567/api";
+
+const API_PROD_BASE_URL = /* import.meta.env.VITE_API_URL ||  */"https://presta-web.vercel.app/graphql";
+ 
  const httpLink = new HttpLink({
-    uri: "http://localhost:2567/graphql",
+    uri: API_PROD_BASE_URL
   });
 
   export const client = new ApolloClient({
