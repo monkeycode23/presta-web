@@ -165,7 +165,7 @@ export function ClientDetail() {
     fetch();
 
     return () => {};
-  }, [authStore.user, _data, filters.loans, pagination.loans]);
+  }, [authStore.user, _data, filters.loans, pagination?.loans]);
 
   useEffect(() => {
     if (!authStore.user) return;
@@ -204,7 +204,7 @@ export function ClientDetail() {
     fetch();
 
     return () => {};
-  }, [authStore.user, data_p, filters.payments, pagination.payments.page]);
+  }, [authStore.user, data_p, filters.payments, pagination.payments?.page]);
 
   if (!client) return;
 
