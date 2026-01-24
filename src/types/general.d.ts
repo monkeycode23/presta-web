@@ -1,6 +1,7 @@
 import { Document, Types } from "mongoose";
 
 export interface IUser {
+    id: string | number;
   _id: Types.ObjectId;
 
   email: string;
@@ -23,7 +24,7 @@ export interface IUser {
   terms: boolean;
   privacy: boolean;
 
-  refreshTokens: Types.ObjectId[];
+  tokens: Types.ObjectId[];
 
   roles: Types.ObjectId[] | any[]; // se poblará con Role
 

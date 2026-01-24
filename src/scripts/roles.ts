@@ -1,5 +1,5 @@
 import Role from "../api/models/role.model";
-import { USER_PERMISSIONS } from "../api/utils/permissions";
+import { USER_PERMISSIONS } from "../application/utils/permissions";
 
 export async function initializeRoles() {
   const defaultRoles = [
